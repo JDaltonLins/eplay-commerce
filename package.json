@@ -4,7 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "website:css": "node-sass --output-style compressed website/static/sass/tema.scss -o website/static/css/",
+    "website:css:watch": "npm run website:css && node-sass --output-style compressed website/static/sass/tema.scss -wo website/static/css/",
+    "painel:css": "node-sass --output-style compressed painel/static/sass/tema.scss -o painel/static/css/",
+    "painel:css:watch": "npm run painel:css && node-sass --output-style compressed painel/static/sass/tema.scss -wo painel/static/css/"
   },
   "repository": {
     "type": "git",
@@ -18,7 +21,6 @@
   },
   "homepage": "https://github.com/JDaltonLins/eplay_commerce#readme",
   "dependencies": {
-    "glob-watcher": "^5.0.5",
     "node-sass": "^8.0.0"
   }
 }
