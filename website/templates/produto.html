@@ -1,0 +1,15 @@
+{% extends 'content/content.html' %}
+
+{% block title %}{{produto.nome}} - ePlay Commerce{% endblock %}
+
+{% block content %}
+
+<!--- Retorna as informações do produto que vai ser visto -->
+
+{{ produto.nome }}
+
+{{ produto.descricao }}
+
+{{ produto.preco }}
+
+{% endblock %}
