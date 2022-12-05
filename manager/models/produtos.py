@@ -9,7 +9,7 @@ import secrets
 
 def upload_to_path(instance: 'ProdutoImagem', filename: str):
     hex = secrets.token_hex(64)
-    return f'produtos/{hex}.{splitext(filename[:-1])}'
+    return f'produtos/{hex}.{splitext(filename)}'
 
 
 class Produto (models.Model):
