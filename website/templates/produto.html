@@ -1,15 +1,76 @@
 {% extends 'content/content.html' %}
+{% load static %}
 
 {% block title %}{{produto.nome}} - ePlay Commerce{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="{% static 'css/produto.css' %}">
+{% endblock %}
 
 {% block content %}
 
 <!--- Retorna as informações do produto que vai ser visto -->
-
-{{ produto.nome }}
-
-{{ produto.descricao }}
-
-{{ produto.preco }}
+<div class="container px-5 py-4">
+    <div class="row">
+        <div class="col-8 gap-3 d-flex flex-column">
+            {% if dados.prelancamento %}
+            <div class="d-flex justify-content-between align-items-center bg-dark border-dark rounded p-3 pb-1">
+                <p class="font-weight-bold">
+                    O produto <span class="text-info">{{ produto.nome }}</span> será lançado em breve. Lançamento:
+                    <span class="text-danger">{{produto.data_lancamento|date:"d/m/Y \à\s G:i"}}</span>
+                </p>
+            </div>
+            {% endif %}
+            <div id="slider" class="carousel slide bg-dark border-dark rounded" data-ride="carousel">
+                <div class="carousel-inner">
+                    {% for i in produto.imagens.all %}
+                    <div class="carousel-item ratio ratio-16x9{% if forloop.counter0 == 0 %} active{% endif %}">
+                        <img class="ratio d-block produto rounded" src="{{i.imagem.url}}" alt="{{i.alt}}" />
+                    </div>
+                    {% endfor %}
+                </div>
+                {% if dados.carousel %}
+                <button class="carousel-control-prev" type="button" data-bs-target="#slider" data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Anterior</span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#slider" data-bs-slide="next">
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Proximo</span>
+                </button>
+                {% endif %}
+            </div>
+            <div class="card bg-dark">
+                <div class="card-body">
+                    <p class="card-text">{{produto.descricao}}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-4">
+            <div class="card bg-dark produto">
+                <div class="card-body">
+                    <span class="card-title nome">{{produto.nome}}</span>
+                    {% if produto.categoria %}
+                    <span class="categoria">
+                        Categoria:
+                        <a href="{% url 'produtos' %}?categorias={{produto.categoria.id}}">{{produto.categoria.nome}}</a>
+                    </span>
+                    {% endif %}
+                    {% if produto.tags %}
+                    <span class="tags">
+                        Tags:
+                        {% for tag in produto.tags.all %}
+                        <a class="tag" href="{% url 'produtos' %}?tags={{tag.id}}">{{tag.nome}}</a>
+                        {% endfor %}
+                    </span>
+                    {% endif %}
+                    <p class="card-text slogan">{{produto.slogan}}</p>
+                    <p class="card-text">R$ {{produto.preco}}</p>
+                    <a href="#" class="btn btn-primary">Adicionar ao Carrinho</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
 {% endblock %}

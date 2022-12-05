@@ -1,15 +1,11 @@
-$primary: #0074d9;
-$secondary: #111111;
-$danger: #ff4136;
-$success: #2ecc40;
-$dark: #323232;
+// Deixar uma pegada mais tema dark no bootstrap
 
-$theme-colors: (
-  "primary": $primary,
-  "secondary": $secondary,
-  "success": $success,
-  "dark": $dark,
-  "danger": $danger,
-);
+@import "./variables";
+
+.navbar {
+  a:not(.now) {
+    color: white !important;
+  }
+}
 
 @import "../../../node_modules/bootstrap/scss/bootstrap";

@@ -1,0 +1,29 @@
+@import "./variables";
+
+.produto {
+  .card-body {
+    display: flex;
+    flex-direction: column;
+  }
+  .nome {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin: 0.5rem 0;
+  }
+  .slogan {
+    margin-top: 0.5rem;
+    color: $gray-300;
+  }
+  .categoria {
+    margin-top: -0.5rem;
+  }
+  .categoria,
+  .tags {
+    font-size: small;
+    font-weight: light;
+  }
+
+  a:not(.btn) {
+    color: $gray-500;
+  }
+}

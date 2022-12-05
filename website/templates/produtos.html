@@ -1,0 +1,95 @@
+{% extends 'content/content.html' %}
+{% load crispy_forms_tags %}
+{% load static %}
+
+{% block head %}
+<link rel="stylesheet" href="{% static 'css/produtos.css' %}">
+{% endblock %}
+
+{% block title %}Produtos - ePlay Commerce{% endblock %}
+{% block mainTags %}class="container-fluid d-flex flex-column flex-sm-row"{% endblock %}
+
+{% block content %}
+
+<div class="filter">
+    <form id="filtro" method="post" class="form bg-dark text-white p-3 rounded position-sticky">
+        {% csrf_token %}
+        {% crispy form %}
+    </form>
+</div>
+<div class="products">
+    <div class="search bg-dark rounded">
+        <form id="pesquisar" method="post" class="form bg-dark text-white p-3 rounded">
+            <div class="input-group">
+                {{ form.q }}
+            </div>
+        </form>
+    </div>
+    <div class="list">
+        {% for produto in produtos %}
+        <a href="{% url 'produto' produto_id=produto.id %}" class="produto">
+            <div class="imagem">
+                <div>
+                    <img src="{{ produto.thumbnail.url }}" alt="{{ produto.nome }}">
+                </div>
+            </div>
+            <div class="info">
+                <p class="nome">{{ produto.nome }}</p>
+                <p class="slogan">{{ produto.slogan }} </p>
+            </div>
+            <div class="preco">
+                {% if 1 %}
+                <p class="desconto bage text-white">{{ produto.desconto }}%</p>
+                <del class="preco-antigo text-white">
+                    R$ {{ produto.preco }}
+                </del>
+                {% endif %}
+                <p class="preco-novo text-white">R$ {{ produto.preco_liquido }}</p>
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+</div>
+
+
+<!--- Retorna as informações do produto que vai ser visto -->
+
+{% endblock %}
+
+{% block scripts %}
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+<link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.13.2/themes/smoothness/jquery-ui.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.13.2/jquery-ui.min.js"></script>
+<script>
+    $(() => {
+        const min = $("#id_preco_min");
+        const max = $("#id_preco_max");
+
+        $("#preco_slide").slider({
+            range: true,
+            min: 0,
+            step: max.attr('step'),
+            max: max.attr('max'),
+            values: [parseFloat(min.val()), parseFloat(max.val())],
+            slide: function (event, ui) {
+                min.val(ui.values[0]);
+                max.val(ui.values[1]);
+            }
+        });
+
+        const concat = (a, b) => Array.isArray(a) ? a.concat(b) : [a, b];
+
+        const form = $("main #filtro, main #pesquisar");
+        form.submit(function (e) {
+            e.preventDefault();
+            const data = [...new FormData(window.document.getElementById("filtro")), ...new FormData(window.document.getElementById("pesquisar"))]
+                .reduce((obj, [key, value]) => ({ ...obj, [key]: (key in obj ? concat(obj[key], value) : value) }), {});
+
+            const url = new URL(window.location.href);
+            url.search = new URLSearchParams(data).toString();
+            console.log(data);
+            window.location = url;
+        });
+    });
+</script>
+{% endblock %}

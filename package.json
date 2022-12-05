@@ -4,10 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "website:css": "node-sass --output-style compressed website/static/sass/tema.scss -o website/static/css/",
-    "website:css:watch": "npm run website:css && node-sass --output-style compressed website/static/sass/tema.scss -wo website/static/css/",
-    "painel:css": "node-sass --output-style compressed painel/static/sass/tema.scss -o painel/static/css/",
-    "painel:css:watch": "npm run painel:css && node-sass --output-style compressed painel/static/sass/tema.scss -wo painel/static/css/"
+    "website:css": "node-sass --output-style compressed website/static/sass/ -o website/static/css/",
+    "website:css:watch": "npm run website:css && node-sass --output-style compressed website/static/sass/ -wo website/static/css/",
+    "painel:css": "node-sass --output-style compressed painel/static/sass/ -o painel/static/css/",
+    "painel:css:watch": "npm run painel:css && node-sass --output-style compressed painel/static/sass/ -wo painel/static/css/"
   },
   "repository": {
     "type": "git",

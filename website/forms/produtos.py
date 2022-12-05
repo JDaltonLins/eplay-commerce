@@ -1,18 +1,26 @@
 from django import forms
+from django.forms import HiddenInput
+from django.db.models import Max
 
 from manager.models.produtos import Categoria, Produto, Tag
 
+from crispy_forms.helper import FormHelper
+from crispy_forms.layout import Layout, Fieldset, Submit, Div
 
-class PesquisaProdutos (forms.Form):
-    q = forms.CharField(required=False)
+
+class FiltroProdutos (forms.Form):
+    q = forms.CharField(label='Pesquisar', required=False, widget=forms.TextInput(
+        attrs={'placeholder': 'Pesquisar', 'class': 'form-control'}))
     # Categorias irá ser por ID
     categorias = forms.MultipleChoiceField(
         required=False, widget=forms.CheckboxSelectMultiple)
     # Tags irá ser por ID/Nome
     tags = forms.MultipleChoiceField(
         required=False, widget=forms.CheckboxSelectMultiple)
-    preco_min = forms.IntegerField(required=False)
-    preco_max = forms.IntegerField(required=False)
+    preco_min = forms.DecimalField(
+        required=False, min_value=0, step_size=0.01, widget=forms.HiddenInput())
+    preco_max = forms.DecimalField(
+        required=False, min_value=0, step_size=0.01, widget=forms.HiddenInput())
 
     order_by = forms.ChoiceField(choices=(
         ('nome', 'Nome'),
@@ -25,10 +33,45 @@ class PesquisaProdutos (forms.Form):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+
         self.fields['categorias'].choices = [
             (c.id, c.nome) for c in Categoria.objects.all()]
         self.fields['tags'].choices = [(t.id, t.nome)
                                        for t in Tag.objects.all()]
+        self.fields['q'].label = False
+
+        max = Produto.objects.all().aggregate(Max('preco'))['preco__max']
+        max = (max // 10 + 1) * 10
+
+        step_calced = max / 10
+
+        self.fields['preco_min'].widget.attrs['max'] = max
+        self.fields['preco_min'].widget.attrs['step'] = step_calced
+        self.fields['preco_max'].widget.attrs['max'] = max
+        self.fields['preco_max'].widget.attrs['step'] = step_calced
+        self.fields['preco_max'].initial = max
+        self.fields['preco_min'].initial = 0
+
+        self.helper = FormHelper()
+        self.helper.form_method = 'GET'
+        self.helper.field_class = 'input-group input-group-sm'
+        self.helper.layout = Layout(
+            Fieldset(
+                'Pesquisa',
+                'categorias',
+                'tags',
+                Div(Div(id='preco_slide'),
+                    'preco_min', 'preco_max'),
+                'order_by',
+                css_class='d-flex flex-column gap-1'
+            ),
+            Submit('submit', 'Pesquisar'),
+        )
+
+    # Atualiza uns campos ao carregar os dados
+    def load(self, data):
+
+        return self.cleaned_data
 
     def clean(self):
         cleaned_data = super().clean()
