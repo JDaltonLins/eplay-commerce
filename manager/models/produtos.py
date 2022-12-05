@@ -1,3 +1,4 @@
+import decimal
 from django.db import models
 from os.path import splitext
 from slugify import slugify
@@ -16,7 +17,7 @@ class Produto (models.Model):
     nome = models.CharField(max_length=100)
     slug = models.SlugField(max_length=100, blank=True, default='')
     slogan = models.CharField(max_length=100, blank=True, default='')
-    descricao = models.CharField(max_length=255)
+    descricao = models.TextField()
     preco = models.DecimalField(max_digits=10, decimal_places=2)
     data_lancamento = models.DateTimeField(
         'Data de Lançamento', blank=True, null=True)
@@ -41,7 +42,7 @@ class Produto (models.Model):
         super().save(*args, **kwargs)
 
     def preco_liquido(self):
-        return self.preco
+        return float(self.preco) * 0.9
 
     def desconto(self):
         return 10

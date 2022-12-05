@@ -5,7 +5,7 @@ from django.db.models import Max
 from manager.models.produtos import Categoria, Produto, Tag
 
 from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Layout, Fieldset, Submit, Div
+from crispy_forms.layout import Layout, Fieldset, Submit, Div, HTML
 
 
 class FiltroProdutos (forms.Form):
@@ -25,7 +25,7 @@ class FiltroProdutos (forms.Form):
     order_by = forms.ChoiceField(choices=(
         ('nome', 'Nome'),
         ('preco', 'Preço'),
-        ('data', 'Lançamento'),
+        ('data_lancamento', 'Lançamento'),
     ), required=False)
     order_reverse = forms.BooleanField(required=False)
 
@@ -60,7 +60,7 @@ class FiltroProdutos (forms.Form):
                 'Pesquisa',
                 'categorias',
                 'tags',
-                Div(Div(id='preco_slide'),
+                Div(HTML('<label class="mb-2">Preço</label>'), Div(id='preco_slide'),
                     'preco_min', 'preco_max'),
                 'order_by',
                 css_class='d-flex flex-column gap-1'
@@ -99,7 +99,7 @@ class FiltroProdutos (forms.Form):
 
         categorias = self.cleaned_data['categorias']
         if categorias:
-            produtos = produtos.filter(categorias__id__in=categorias)
+            produtos = produtos.filter(categoria__id__in=categorias)
 
         tags = self.cleaned_data['tags']
         if tags:
@@ -114,7 +114,7 @@ class FiltroProdutos (forms.Form):
             produtos = produtos.filter(preco__lte=preco_max)
 
         order_by = self.cleaned_data['order_by']
-        order_reverse = self.cleaned_data['order_reverse']
+        order_reverse = not self.cleaned_data['order_reverse']
 
         if order_by:
             produtos = produtos.order_by(order_by)

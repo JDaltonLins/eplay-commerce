@@ -13,12 +13,12 @@
 <div class="container px-5 py-4">
     <div class="row">
         <div class="col-8 gap-3 d-flex flex-column">
-            {% if dados.prelancamento %}
-            <div class="d-flex justify-content-between align-items-center bg-dark border-dark rounded p-3 pb-1">
-                <p class="font-weight-bold">
+            {% if produto.data_lancamento %}
+            <div class="d-flex justify-content-between align-items-center bg-dark border-dark rounded p-3">
+                <span class="font-weight-bold lancamento">
                     O produto <span class="text-info">{{ produto.nome }}</span> será lançado em breve. Lançamento:
                     <span class="text-danger">{{produto.data_lancamento|date:"d/m/Y \à\s G:i"}}</span>
-                </p>
+                </span>
             </div>
             {% endif %}
             <div id="slider" class="carousel slide bg-dark border-dark rounded" data-ride="carousel">
@@ -29,7 +29,7 @@
                     </div>
                     {% endfor %}
                 </div>
-                {% if dados.carousel %}
+                {% if produto.imagens %}
                 <button class="carousel-control-prev" type="button" data-bs-target="#slider" data-bs-slide="prev">
                     <span class="carousel-control-prev-icon" aria-hidden="true"></span>
                     <span class="visually-hidden">Anterior</span>
@@ -42,7 +42,7 @@
             </div>
             <div class="card bg-dark">
                 <div class="card-body">
-                    <p class="card-text">{{produto.descricao}}</p>
+                    <span class="card-text">{{produto.descricao|linebreaks}}</span>
                 </div>
             </div>
         </div>
@@ -53,7 +53,8 @@
                     {% if produto.categoria %}
                     <span class="categoria">
                         Categoria:
-                        <a href="{% url 'produtos' %}?categorias={{produto.categoria.id}}">{{produto.categoria.nome}}</a>
+                        <a
+                            href="{% url 'produtos' %}?categorias={{produto.categoria.id}}">{{produto.categoria.nome}}</a>
                     </span>
                     {% endif %}
                     {% if produto.tags %}

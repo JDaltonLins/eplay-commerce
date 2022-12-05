@@ -1,5 +1,6 @@
 {% extends 'content/content.html' %}
 {% load crispy_forms_tags %}
+{% load humanize %}
 {% load static %}
 
 {% block head %}
@@ -20,6 +21,7 @@
 <div class="products">
     <div class="search bg-dark rounded">
         <form id="pesquisar" method="post" class="form bg-dark text-white p-3 rounded">
+            {% csrf_token %}
             <div class="input-group">
                 {{ form.q }}
             </div>
@@ -35,16 +37,16 @@
             </div>
             <div class="info">
                 <p class="nome">{{ produto.nome }}</p>
-                <p class="slogan">{{ produto.slogan }} </p>
+                <p class="slogan text-break">{{ produto.slogan }} </p>
             </div>
             <div class="preco">
                 {% if 1 %}
                 <p class="desconto bage text-white">{{ produto.desconto }}%</p>
                 <del class="preco-antigo text-white">
-                    R$ {{ produto.preco }}
+                    R$ {{ produto.preco|floatformat:2|intcomma }}
                 </del>
                 {% endif %}
-                <p class="preco-novo text-white">R$ {{ produto.preco_liquido }}</p>
+                <p class="preco-novo text-white">R$ {{ produto.preco_liquido|floatformat:2|intcomma }}</p>
             </div>
         </a>
         {% endfor %}
@@ -79,7 +81,7 @@
 
         const concat = (a, b) => Array.isArray(a) ? a.concat(b) : [a, b];
 
-        const form = $("main #filtro, main #pesquisar");
+        /*const form = $("main #filtro, main #pesquisar");
         form.submit(function (e) {
             e.preventDefault();
             const data = [...new FormData(window.document.getElementById("filtro")), ...new FormData(window.document.getElementById("pesquisar"))]
@@ -89,7 +91,7 @@
             url.search = new URLSearchParams(data).toString();
             console.log(data);
             window.location = url;
-        });
+        });*/
     });
 </script>
 {% endblock %}

@@ -13,20 +13,31 @@ main {
   min-width: 250px;
 
   #div_id_tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.1rem;
+
     .input-group {
       width: fit-content;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.1rem;
     }
 
     .form-check {
       background-color: lighten($dark, 15%);
       border-radius: 1rem;
-      padding: 0.5rem;
-      margin: 0.2rem 0.7rem;
+      padding: 0.1rem 0.6rem;
+      // margin: 0.2rem 0.7rem;
+      margin: 0;
     }
   }
 
   input[type="checkbox"] {
     border-radius: 50%;
+
+    margin-left: 0;
+    margin-right: 0.2rem;
   }
 }
 
@@ -77,6 +88,10 @@ main {
   text-decoration: none;
   transition: cubic-bezier(0.175, 0.885, 0.32, 1.275) 0.2s;
 
+  @include media-breakpoint-up(sm) {
+    width: 250px;
+  }
+
   &:hover .imagem::after {
     opacity: 0.1;
   }
@@ -92,9 +107,6 @@ main {
   > .imagem {
     user-select: none;
     pointer-events: none;
-    @include media-breakpoint-up(sm) {
-      width: 220px;
-    }
 
     // height: 100%;
     // object-fit: cover;
@@ -110,6 +122,7 @@ main {
       width: 100%;
       overflow: hidden;
       position: absolute;
+      border-radius: 0.5rem;
 
       > img {
         max-width: 100%;
@@ -118,7 +131,6 @@ main {
         image-rendering: -webkit-optimize-contrast;
         transition: opacity 125ms ease-in-out 0s;
         opacity: 1;
-        border-radius: 0.5rem;
         width: 100%;
       }
     }
