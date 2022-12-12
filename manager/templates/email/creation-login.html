@@ -1,0 +1,11 @@
+{% extends './index.html '%}
+
+{% block title %}Olá, <strong>{{ usuario.nome }}</strong>!{% endblock %}
+{% block subtitle %}Seu cadastro foi realizado com sucesso!{% endblock %}
+{% block container %}
+
+<p>Agora é necessário que realize a confirmação do cadastro de seu usuário</p>
+<a class="btn btn-confirm">
+    <span>Confirmar cadastro</span>
+</a>
+{% endblock %}

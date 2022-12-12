@@ -13,7 +13,6 @@ urlpatterns = [
     path('produto/', procurar, name='produtos'),
     path('produto/<int:produto_id>-<slug:raw_slug>', produto, name='produto'),
     path('produto/<int:produto_id>', produto, name='produto'),
-    path('view/', render, {'template_name': 'content/content.html'}),
     path('promocoes/', render,
          {'template_name': 'promocoes.html'}, name='promocoes'),
 ]
