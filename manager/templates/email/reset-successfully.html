@@ -1,0 +1,84 @@
+{% extends './index.html' %}
+{% block title %}Olá, {{ usuario.nome }}!{% endblock %}
+{% block subtitle %}Troca de senha{% endblock %}
+
+{% block ownStyle %}
+<style>
+    .about {
+        border: 1px solid #e7e7e7;
+        padding: 1rem;
+        margin: 1rem 0;
+        background-color: #f3f3f3;
+        box-shadow: 0 .125rem .25rem rgba(0, 0, 0, .075) !important;
+    }
+
+    .about .title {
+        font-weight: lighter;
+        margin-bottom: 0.5rem;
+    }
+
+    .about .body {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        align-items: center;
+    }
+
+
+    .btn-warn {
+        background-color: #f44336;
+        color: #fff;
+    }
+
+    .btn-warn:hover {
+        background-color: #d32f2f;
+    }
+
+    .warning p {
+        padding-bottom: 1rem;
+    }
+</style>
+{% endblock %}
+
+{% block container %}
+
+<p>Sua senha foi trocada com sucesso!</p>
+
+
+<div class="about center rounded">
+    <p class="title text-center">Informações sobre a tentativa</p>
+    <div class="body">
+        {% if confirmacao.isMobile %}
+        <svg xmlns="http://www.w3.org/2000/svg" height="48" width="48">
+            <path
+                d="M13 46q-1.2 0-2.1-.9-.9-.9-.9-2.1V5q0-1.2.9-2.1.9-.9 2.1-.9h22q1.2 0 2.1.9.9.9.9 2.1v38q0 1.2-.9 2.1-.9.9-2.1.9Zm0-4.5V43h22v-1.5Zm0-3h22v-29H13Zm0-32h22V5H13Zm0 0V5v1.5Zm0 35V43Z" />
+        </svg>
+        {% else %}
+        <svg xmlns="http://www.w3.org/2000/svg" height="48" width="48">
+            <path
+                d="M3.5 42q-.65 0-1.075-.425Q2 41.15 2 40.5q0-.65.425-1.075Q2.85 39 3.5 39h41q.65 0 1.075.425Q46 39.85 46 40.5q0 .65-.425 1.075Q45.15 42 44.5 42ZM7 36q-1.2 0-2.1-.9Q4 34.2 4 33V9q0-1.2.9-2.1Q5.8 6 7 6h34q1.2 0 2.1.9.9.9.9 2.1v24q0 1.2-.9 2.1-.9.9-2.1.9Zm0-3h34V9H7v24Zm0 0V9v24Z" />
+        </svg>
+        {% endif %}
+        <span class="info">
+            <p>Origem: <strong>{{ confirmacao.ip }}</strong></p>
+            <p>Sistema: <strong>{{ confirmacao.system }}</strong></p>
+            <p>Navegador: <strong>{{ confirmacao.user_agent }}</strong></p>
+            <p>Localização: <strong>{{ confirmacao.country_name }} ({{ confirmacao.country_code }})</strong></p>
+        </span>
+    </div>
+</div>
+
+<hr>
+
+<div class="warning">
+    <p>Caso tenha algo de incomum favor redefinir novamente.</p>
+
+    <a class="btn btn-warn" href="{ url 'auth/verify-email' uid=confirmacao.uid token=confirmacao.token }">
+        <span>Redefinir senha</span>
+    </a>
+</div>
+
+
+
+
+{% endblock %}

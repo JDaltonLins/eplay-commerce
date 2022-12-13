@@ -1,8 +1,6 @@
-import decimal
 from django.db import models
+from django.template.defaultfilters import slugify
 from os.path import splitext
-from slugify import slugify
-from django import forms
 import secrets
 
 # Gera um random hex no inicio do nome do arquivo
