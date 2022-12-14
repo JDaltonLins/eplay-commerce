@@ -5,7 +5,8 @@
 {% block container %}
 
 <p>Agora é necessário que realize a confirmação do cadastro de seu usuário</p>
-<a class="btn btn-confirm">
+<a href="{% url 'auth/verify/' type=confirmacao.type uid=confirmacao.uid token=confirmacao.token %}"
+    class="btn btn-confirm">
     <span>Confirmar cadastro</span>
 </a>
 {% endblock %}

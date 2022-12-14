@@ -15,6 +15,7 @@ class UsuarioManager(BaseUserManager):
                           username=username, **extra_fields)
         user.set_password(password)
         user.save(using=self._db)
+        self.send_verify_email(user, 'email', True)
         return user
 
     def create_superuser(self, email, username, password, **extra_fields):
@@ -27,11 +28,3 @@ class UsuarioManager(BaseUserManager):
         user.is_superuser = True
         user.save(using=self._db)
         return user
-
-    def send_verify_email(self, usuario, uid, token):
-        pass
-
-    def verify_email(self, usuario, uid, token):
-        if usuario.email == email:
-            return True
-        return False
