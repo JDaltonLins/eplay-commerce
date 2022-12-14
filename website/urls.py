@@ -3,6 +3,7 @@ from django.shortcuts import render, redirect
 from django.urls import reverse
 
 from website.views.produtos import produto, procurar
+from website.views.auth import urlpatterns as auth_patterns
 
 urlpatterns = [
     path('', render, {'template_name': 'index.html'}, name='inicio'),
@@ -15,4 +16,4 @@ urlpatterns = [
     path('produto/<int:produto_id>', produto, name='produto'),
     path('promocoes/', render,
          {'template_name': 'promocoes.html'}, name='promocoes'),
-]
+] + auth_patterns
