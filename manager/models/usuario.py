@@ -1,6 +1,7 @@
 from django.contrib.auth.models import PermissionsMixin, AbstractUser
 from django.db import models
 
+from manager.managers.usuario import UsuarioManager
 import random
 import string
 
