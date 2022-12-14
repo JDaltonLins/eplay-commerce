@@ -10,6 +10,5 @@ clsmembers = inspect.getmembers(sys.modules['manager.models'], inspect.isclass)
 # Pega todo tipo de modelo que extende a classe Model e retorna somente os que não são abstratos, somente os validos
 
 for name, cls in clsmembers:
-    if cls.__module__ == 'manager.models' and issubclass(cls, models
-        print('Registering model: ' + name)
+    if issubclass(cls, admin.ModelAdmin) and not cls._meta.abstract:
         admin.site.register(cls)
