@@ -1,0 +1,32 @@
+{% extends './index.html' %}
+{% block title %}Olá, {{ usuario.nome }}!{% endblock %}
+{% block subtitle %}Troca de senha{% endblock %}
+
+{% block ownStyle %}
+<style>
+    .warning p {
+        padding-bottom: 1rem;
+    }
+</style>
+{% endblock %}
+
+{% block container %}
+
+<p>Sua senha foi trocada com sucesso!</p>
+
+{% include './access-info.html' %}
+
+<hr>
+
+<div class="warning">
+    <p class="text-justify">Caso tenha algo de incomum favor redefinir novamente.</p>
+
+    <a class="btn btn-warn" href="{ url 'auth/verify-email' uid=confirmacao.uid token=confirmacao.token }">
+        <span>Redefinir senha</span>
+    </a>
+</div>
+
+
+
+
+{% endblock %}

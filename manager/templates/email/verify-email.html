@@ -1,0 +1,14 @@
+{% extends './index.html' %}
+
+{% block title %}Olá, <strong>{{ usuario.nome }}</strong>!{% endblock %}
+{% block subtitle %}Verificação de e-mail{% endblock %}
+{% block container %}
+
+<p>
+    Recentemente, foi realizado a verificação do seu e-mail, para confirmar basta clicar no botão abaixo ou copia o link.
+</p>
+<a href="{% url 'auth/verify/' type=confirmacao.type uid=confirmacao.uid token=confirmacao.token %}"
+    class="btn btn-confirm">
+    <span>Confirmar cadastro</span>
+</a>
+{% endblock %}
