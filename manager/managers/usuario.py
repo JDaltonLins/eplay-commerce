@@ -1,10 +1,11 @@
 from django.contrib.auth.models import BaseUserManager
 from django.utils.translation import gettext_lazy as _
 
+from django.conf import settings
+
 
 class UsuarioManager(BaseUserManager):
     def create_user(self, email, username, password=None, **extra_fields):
-        print(email, username, password)
         """
         Creates and saves a User with the given email and password.
         """
@@ -15,7 +16,8 @@ class UsuarioManager(BaseUserManager):
                           username=username, **extra_fields)
         user.set_password(password)
         user.save(using=self._db)
-        self.send_verify_email(user, 'email', True)
+        if settings.EMAIL_USE:
+            self.send_verify_email(user, 'email', True)
         return user
 
     def create_superuser(self, email, username, password, **extra_fields):

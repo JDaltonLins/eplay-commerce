@@ -11,8 +11,10 @@ main {
   left: 2rem;
   height: fit-content;
   min-width: 250px;
+  max-width: 300px;
 
-  #div_id_tags {
+  #div_id_tags,
+  #div_id_categorias {
     display: flex;
     flex-wrap: wrap;
     gap: 0.1rem;
@@ -25,11 +27,21 @@ main {
     }
 
     .form-check {
+      line-height: normal;
+      min-height: unset;
       background-color: lighten($dark, 15%);
       border-radius: 1rem;
       padding: 0.1rem 0.6rem;
       // margin: 0.2rem 0.7rem;
       margin: 0;
+
+      label {
+        text-transform: capitalize;
+        max-width: 8rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
     }
   }
 
@@ -58,8 +70,9 @@ main {
     display: flex;
     justify-content: end;
 
-    > form {
+    >form {
       height: fit-content;
+
       @include media-breakpoint-down(sm) {
         width: 100%;
       }
@@ -77,6 +90,7 @@ main {
   }
 }
 
+
 .produto {
   position: relative;
   display: flex;
@@ -87,9 +101,10 @@ main {
   border-radius: 0.5rem;
   text-decoration: none;
   transition: cubic-bezier(0.175, 0.885, 0.32, 1.275) 0.2s;
+  justify-content: space-between;
 
   @include media-breakpoint-up(sm) {
-    width: 250px;
+    width: 240px;
   }
 
   &:hover .imagem::after {
@@ -104,18 +119,18 @@ main {
     margin: 0;
   }
 
-  > .imagem {
+  .imagem {
     user-select: none;
     pointer-events: none;
 
     // height: 100%;
     // object-fit: cover;
     position: relative;
-    padding-bottom: calc(4 / 3 * 100%);
+    padding-bottom: calc(4 / 3.4 * 100%);
     border-radius: 0.5rem;
     background-color: $dark2;
 
-    > div {
+    >div {
       align-items: center;
       display: flex;
       height: 100%;
@@ -124,7 +139,7 @@ main {
       position: absolute;
       border-radius: 0.5rem;
 
-      > img {
+      >img {
         max-width: 100%;
         height: auto;
         display: block;
@@ -151,19 +166,22 @@ main {
       border-radius: 0.5rem;
     }
   }
-  > .info {
+
+  .info {
     color: white;
-    > .nome {
+
+    >.nome {
       font-size: 1.2rem;
       font-weight: 600;
     }
-    > .slogan {
+
+    >.slogan {
       font-size: 0.8rem;
       color: $gray-300;
     }
   }
 
-  > .preco {
+  .preco {
     display: flex;
     flex-direction: row;
     align-items: center;
@@ -171,16 +189,15 @@ main {
     font-size: 1.1rem;
     font-weight: 600;
 
-    > .preco-antigo {
+    >.preco-antigo {
       color: $gray-600 !important;
       text-decoration: line-through;
       margin-right: 0.5rem;
     }
 
-    > .preco-novo {
-    }
+    >.preco-novo {}
 
-    > .desconto {
+    >.desconto {
       font-size: 0.9rem;
       font-weight: 500;
       letter-spacing: 1px;

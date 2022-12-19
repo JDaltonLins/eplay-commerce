@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "website:reset": "rm -rf ./media/ && python manage.py flush --no-input",
     "website:css": "node-sass --output-style compressed website/static/sass/ -o website/static/css/",
     "website:css:watch": "npm run website:css && node-sass --output-style compressed website/static/sass/ -wo website/static/css/",
     "painel:css": "node-sass --output-style compressed painel/static/sass/ -o painel/static/css/",

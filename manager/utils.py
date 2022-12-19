@@ -1,5 +1,21 @@
 from django.http import HttpResponse, JsonResponse, HttpResponseNotAllowed
-from json import loads
+from django.utils import timezone
+from django.contrib.sessions.models import Session
+
+import json
+import random
+import string
+
+from website.utils import redirect_to
+
+
+def delete_all_unexpired_sessions_for_user(user):
+    unexpired_sessions = Session.objects.filter(
+        expire_date__gte=timezone.now())
+    [
+        session.delete() for session in unexpired_sessions
+        if str(user.pk) == session.get_decoded().get('_auth_user_id')
+    ]
 
 
 def json(func):
@@ -11,12 +27,14 @@ def json(func):
     return wrapper
 
 
-def login_requirement(func, required=True):
-    def wrapper(request, *args, **kwargs):
-        if not request.user.is_authenticated != required:
-            return HttpResponse(status=401)
-        return func(request, *args, **kwargs)
-    return wrapper
+def required_login(required=True, required_email=True, redirect=None):
+    def decorator(func):
+        def wrapper(request, *args, **kwargs):
+            if request.user.is_authenticated != required or (required_email and not request.user.email_verified):
+                return redirect_to(request, **redirect) if redirect else HttpResponse(status=401)
+            return func(request, *args, **kwargs)
+        return wrapper
+    return decorator
 
 
 def admin_required(func):
@@ -48,7 +66,7 @@ def body_params(*params):
         def wrapper(request, *args, **kwargs):
             if request.method not in ['POST', 'PUT']:
                 return HttpResponseNotAllowed(['POST', 'PUT'])
-            body = loads(request.body)
+            body = json.loads(request.body)
             kwargs.update({param: body[param] for param in params})
             try:
                 return func(request, *args, **kwargs)
@@ -56,11 +74,11 @@ def body_params(*params):
                 return JsonResponse({'error': str(e)}, status=400)
         return wrapper
     return decorator
-import random
-import string
+
 
 def random_token(size=100):
     return ''.join(random.choice(string.ascii_letters + string.digits) for _ in range(size))
+
 
 def random_uid():
     ''.join(random.choice(string.hexdigits) for _ in range(32))

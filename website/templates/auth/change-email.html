@@ -1,0 +1,25 @@
+{% extends "./../layout/index.html" %}
+{% load crispy_forms_tags %}
+{% load static %}
+{% load website_tags %}
+{% block head %}
+    <style>
+    body {
+        height: 100vh;
+    }
+    </style>
+    <link rel="stylesheet" href="{% static 'css/auth.css' %}" />
+{% endblock head %}
+{% block bodyTags %}
+    page="change-email"{% endblock bodyTags %}
+    {% block mainTags %}{% endblock mainTags %}
+    {% block content %}
+        <div class="change-email-content">
+            <form method="post"
+                  action="{% redirect_to 'auth/change-email' next=request.GET.next %}">
+                {% crispy form %}
+            </form>
+        </div>
+    {% endblock content %}
+    {% block scripts %}
+    {% endblock scripts %}

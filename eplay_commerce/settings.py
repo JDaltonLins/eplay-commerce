@@ -125,6 +125,9 @@ USE_TZ = True
 STATIC_URL = 'static/'
 STATIC_ROOT = os.path.join(BASE_DIR, "static")
 
+MEDIA_ROOT = BASE_DIR / 'media'
+MEDIA_URL = 'media/'
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
 
@@ -137,10 +140,12 @@ CRISPY_TEMPLATE_PACK = "bootstrap5"
 
 AUTH_USER_MODEL = "manager.Usuario"
 
+# Sistema de emails
+EMAIL_USE = False
 EMAIL_USE_TLS = True
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
-EMAIL_HOST_USER = 'sender@jdaltonlins.com'
+EMAIL_HOST_USER = 'admin@jdaltonlins.com'
 EMAIL_HOST_PASSWORD = 'password'
 
-EMAIL_NOREPLY = 'nao-responda@jdaltonlins.com.br'
+EMAIL_NO_REPLY = 'nao-responda@jdaltonlins.dev'

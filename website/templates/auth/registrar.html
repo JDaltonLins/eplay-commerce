@@ -1,0 +1,28 @@
+{% extends "./../layout/index.html" %}
+
+{% load crispy_forms_tags %}
+{% load static %}
+{% load website_tags %}
+
+{% block head %}
+    <style>
+    body {
+        height: 100vh;
+    }
+    </style>
+    <link rel="stylesheet" href="{% static 'css/auth.css' %}" />
+{% endblock head %}
+
+{% block mainTags %}{% endblock mainTags %}
+{% block bodyTags %}page="register"{% endblock bodyTags %}
+
+{% block content %}
+    <div class="register-content">
+        <form method="post"
+              action="{% redirect_to 'auth/register' next=request.GET.next %}">
+            {% crispy form %}
+        </form>
+    </div>
+{% endblock content %}
+{% block scripts %}
+{% endblock scripts %}

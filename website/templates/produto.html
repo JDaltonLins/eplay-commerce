@@ -1,77 +1,106 @@
-{% extends 'content/content.html' %}
+{% extends "layout/index.html" %}
 {% load static %}
-
-{% block title %}{{produto.nome}} - ePlay Commerce{% endblock %}
-
 {% block head %}
-<link rel="stylesheet" href="{% static 'css/produto.css' %}">
-{% endblock %}
-
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.8/dist/sweetalert2.min.css"
+          integrity="sha256-sWZjHQiY9fvheUAOoxrszw9Wphl3zqfVaz1kZKEvot8="
+          crossorigin="anonymus"/>
+    <script id="produto-data" type="application/ld+json">{% autoescape off %}{{ produto_meta }}{% endautoescape %}</script>
+    <link rel="stylesheet" href="{% static 'css/produto.css' %}"/>
+{% endblock head %}
 {% block content %}
-
-<!--- Retorna as informações do produto que vai ser visto -->
-<div class="container px-5 py-4">
-    <div class="row">
-        <div class="col-8 gap-3 d-flex flex-column">
-            {% if produto.data_lancamento %}
-            <div class="d-flex justify-content-between align-items-center bg-dark border-dark rounded p-3">
-                <span class="font-weight-bold lancamento">
-                    O produto <span class="text-info">{{ produto.nome }}</span> será lançado em breve. Lançamento:
-                    <span class="text-danger">{{produto.data_lancamento|date:"d/m/Y \à\s G:i"}}</span>
-                </span>
-            </div>
-            {% endif %}
-            <div id="slider" class="carousel slide bg-dark border-dark rounded" data-ride="carousel">
-                <div class="carousel-inner">
-                    {% for i in produto.imagens.all %}
-                    <div class="carousel-item ratio ratio-16x9{% if forloop.counter0 == 0 %} active{% endif %}">
-                        <img class="ratio d-block produto rounded" src="{{i.imagem.url}}" alt="{{i.alt}}" />
+    <!--- Retorna as informações do produto que vai ser visto -->
+    <div class="container px-5 py-4">
+        <div class="row">
+            <div class="col-8 gap-3 d-flex flex-column">
+                {% if produto.data_lancamento %}
+                    <div class="d-flex justify-content-between align-items-center bg-dark border-dark rounded p-3">
+                        <span class="font-weight-bold lancamento">
+                            O produto <span class="text-info">{{ produto.nome }}</span> será lançado em breve. Lançamento:
+                            <span class="text-danger">{{ produto.data_lancamento|date:"d/m/Y \à\s G:i" }}</span>
+                        </span>
                     </div>
-                    {% endfor %}
-                </div>
-                {% if produto.imagens %}
-                <button class="carousel-control-prev" type="button" data-bs-target="#slider" data-bs-slide="prev">
-                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                    <span class="visually-hidden">Anterior</span>
-                </button>
-                <button class="carousel-control-next" type="button" data-bs-target="#slider" data-bs-slide="next">
-                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                    <span class="visually-hidden">Proximo</span>
-                </button>
                 {% endif %}
-            </div>
-            <div class="card bg-dark">
-                <div class="card-body">
-                    <span class="card-text">{{produto.descricao|linebreaks}}</span>
+                <div id="slider"
+                     class="carousel slide bg-dark border-dark rounded"
+                     data-ride="carousel">
+                    <div class="carousel-inner">
+                        {% for i in produto.imagens.all %}
+                            <div class="carousel-item ratio ratio-16x9{% if forloop.counter0 == 0 %} active{% endif %}">
+                                <img class="ratio d-block produto rounded"
+                                     src="{{ i.imagem.url }}"
+                                     alt="{{ produto.nome }}"/>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    {% if produto.imagens %}
+                        <button class="carousel-control-prev"
+                                type="button"
+                                data-bs-target="#slider"
+                                data-bs-slide="prev">
+                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Anterior</span>
+                        </button>
+                        <button class="carousel-control-next"
+                                type="button"
+                                data-bs-target="#slider"
+                                data-bs-slide="next">
+                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Proximo</span>
+                        </button>
+                    {% endif %}
+                </div>
+                <div class="card bg-dark">
+                    <div class="card-body">
+                        <span class="card-text">{{ produto.descricao|linebreaks }}</span>
+                    </div>
                 </div>
             </div>
-        </div>
-        <div class="col-4">
-            <div class="card bg-dark produto">
-                <div class="card-body">
-                    <span class="card-title nome">{{produto.nome}}</span>
-                    {% if produto.categoria %}
-                    <span class="categoria">
-                        Categoria:
-                        <a
-                            href="{% url 'produtos' %}?categorias={{produto.categoria.id}}">{{produto.categoria.nome}}</a>
-                    </span>
-                    {% endif %}
-                    {% if produto.tags %}
-                    <span class="tags">
-                        Tags:
-                        {% for tag in produto.tags.all %}
-                        <a class="tag" href="{% url 'produtos' %}?tags={{tag.id}}">{{tag.nome}}</a>
-                        {% endfor %}
-                    </span>
-                    {% endif %}
-                    <p class="card-text slogan">{{produto.slogan}}</p>
-                    <p class="card-text">R$ {{produto.preco}}</p>
-                    <a href="#" class="btn btn-primary">Adicionar ao Carrinho</a>
+            <div class="col-4">
+                <div class="card bg-dark produto">
+                    <div class="card-body">
+                        <span class="card-title nome">{{ produto.nome }}</span>
+                        {% if produto.categorias.count %}
+                            <span class="categoria">
+                                Categoria:
+                                {% for categoria in produto.categorias.all %}
+                                    <a class="tag" href="{% url 'produtos' %}?categorias={{ categoria.id }}">{{ categoria.nome }}</a>
+                                {% endfor %}
+                            </span>
+                        {% endif %}
+                        {% if produto.tags.count %}
+                            <span class="tags">
+                                Tags:
+                                {% for tag in produto.tags.all %}
+                                    <a class="tag" href="{% url 'produtos' %}?tags={{ tag.id }}">{{ tag.nome }}</a>
+                                {% endfor %}
+                            </span>
+                        {% endif %}
+                        <p class="card-text slogan">{{ produto.slogan }}</p>
+                        <p class="card-text">R$ {{ produto.preco }}</p>
+                        <div class="form-group pb-1">
+                            <label for="quantidade">Quantidade</label>
+                            <input type="number"
+                                   class="form-control"
+                                   id="quantidade"
+                                   value="1"
+                                   min="1"
+                                   max="{{ produto.estoque }}"/>
+                        </div>
+                        <span class="pb-2">
+                            <span class="d-inline-block badge rounded-pill text-bg-secondary">Estoque: <span class="badge rounded-pill text-bg-danger">{{ produto.estoque }}</span></span>
+                            <span class="d-inline-block badge rounded-pill text-bg-secondary">Carrinho: <span id="carrinho" class="badge rounded-pill text-bg-danger">0</span></span>
+                        </span>
+                        <a class="btn btn-primary btn-cart">Adicionar ao Carrinho</a>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
-
-{% endblock %}
+{% endblock content %}
+{% block scripts %}
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.8/dist/sweetalert2.min.js"
+            integrity="sha256-Hwfn4rHzN55PApkU+MW1HDu4MjBqBMtKEf6YRi2of2Q="
+            crossorigin="anonymous"></script>
+    <script src="{% static 'js/cart.js' %}"></script>
+{% endblock scripts %}

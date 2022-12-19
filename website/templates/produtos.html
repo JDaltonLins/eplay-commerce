@@ -1,68 +1,94 @@
-{% extends 'content/content.html' %}
+{% extends "layout/index.html" %}
 {% load crispy_forms_tags %}
 {% load humanize %}
 {% load static %}
-
+{% load website_tags %}
 {% block head %}
-<link rel="stylesheet" href="{% static 'css/produtos.css' %}">
-{% endblock %}
-
-{% block title %}Produtos - ePlay Commerce{% endblock %}
-{% block mainTags %}class="container-fluid d-flex flex-column flex-sm-row"{% endblock %}
-
-{% block content %}
-
-<div class="filter">
-    <form id="filtro" method="post" class="form bg-dark text-white p-3 rounded position-sticky">
-        {% csrf_token %}
-        {% crispy form %}
-    </form>
-</div>
-<div class="products">
-    <div class="search bg-dark rounded">
-        <form id="pesquisar" method="post" class="form bg-dark text-white p-3 rounded">
-            {% csrf_token %}
-            <div class="input-group">
-                {{ form.q }}
+    <link rel="stylesheet" href="{% static 'css/produtos.css' %}" />
+    <link rel="stylesheet"
+          href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.13.2/themes/smoothness/jquery-ui.css"/>
+{% endblock head %}
+{% block title %}
+    Produtos - ePlay Commerce
+{% endblock title %}
+{% block mainTags %}
+    class="container-fluid d-flex flex-column flex-sm-row"{% endblock mainTags %}
+    {% block content %}
+        <div class="filter">
+            <form id="filtro"
+                  method="post"
+                  class="form bg-dark text-white p-3 rounded position-sticky">
+                {% crispy form %}
+            </form>
+        </div>
+        <div class="products">
+            <div class="search bg-dark rounded">
+                <form id="pesquisar"
+                      method="post"
+                      class="form bg-dark text-white p-3 rounded">
+                    <div class="input-group">{{ form.q }}</div>
+                </form>
             </div>
-        </form>
-    </div>
-    <div class="list">
-        {% for produto in produtos %}
-        <a href="{% url 'produto' produto_id=produto.id %}" class="produto">
-            <div class="imagem">
-                <div>
-                    <img src="{{ produto.thumbnail.url }}" alt="{{ produto.nome }}">
-                </div>
+            <div class="list">
+                {% for produto in paginacao %}
+                    <a href="{% url 'produto' produto_id=produto.id %}" class="produto">
+                        <div class="body">
+                            <div class="imagem">
+                                <div>
+                                    <img src="{{ produto.thumbnail.url }}" alt="{{ produto.nome }}" />
+                                </div>
+                            </div>
+                            <div class="info">
+                                <p class="nome">{{ produto.nome }}</p>
+                                <p class="slogan text-break">{{ produto.slogan }}</p>
+                            </div>
+                        </div>
+                        <div class="preco">
+                            {% if 1 %}
+                                <p class="desconto bage text-white">{{ produto.desconto }}%</p>
+                                <del class="preco-antigo text-white">
+                                    R$ {{ produto.preco|floatformat:2|intcomma }}
+                                </del>
+                            {% endif %}
+                            {% if produto.preco_liquido == 0 %}
+                                <p class="preco-novo text-white">Grátis</p>
+                            {% else %}
+                                <p class="preco-novo text-white">R$ {{ produto.preco_liquido|floatformat:2|intcomma }}</p>
+                            {% endif %}
+                        </div>
+                    </a>
+                {% endfor %}
             </div>
-            <div class="info">
-                <p class="nome">{{ produto.nome }}</p>
-                <p class="slogan text-break">{{ produto.slogan }} </p>
+            <div class="d-flex justify-content-center">
+                <nav aria-label="Navegação de Pagina">
+                    <ul class="pagination">
+                        <li class="page-item{% if not paginacao.has_previous %} disabled{% endif %}">
+                            <a class="page-link"
+                               {% if paginacao.has_previous %}href="{% redirect_current pagina=paginacao.previous_page_number %}" {% endif %}>Voltar</a>
+                        </li>
+                        {% for i in paginacao.paginator.page_range %}
+                            <li class="page-item">
+                                {% if paginacao.number == i %}
+                                    <a class="page-link disabled">{{ i }}</a>
+                                {% else %}
+                                    <a class="page-link" href="{% redirect_current pagina=i %}">{{ i }}</a>
+                                {% endif %}
+                            </li>
+                        {% endfor %}
+                        <li class="page-item{% if not paginacao.has_next %} disabled{% endif %}">
+                            <a class="page-link"
+                               {% if paginacao.has_next %}href="{% redirect_current pagina=paginacao.next_page_number %}" {% endif %}>Proxímo</a>
+                        </li>
+                    </ul>
+                </nav>
             </div>
-            <div class="preco">
-                {% if 1 %}
-                <p class="desconto bage text-white">{{ produto.desconto }}%</p>
-                <del class="preco-antigo text-white">
-                    R$ {{ produto.preco|floatformat:2|intcomma }}
-                </del>
-                {% endif %}
-                <p class="preco-novo text-white">R$ {{ produto.preco_liquido|floatformat:2|intcomma }}</p>
-            </div>
-        </a>
-        {% endfor %}
-    </div>
-</div>
-
-
-<!--- Retorna as informações do produto que vai ser visto -->
-
-{% endblock %}
-
-{% block scripts %}
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
-<link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.13.2/themes/smoothness/jquery-ui.css">
-<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.13.2/jquery-ui.min.js"></script>
-<script>
+        </div>
+        <!--- Retorna as informações do produto que vai ser visto -->
+    {% endblock content %}
+    {% block scripts %}
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.13.2/jquery-ui.min.js"></script>
+        <script>
     $(() => {
         const min = $("#id_preco_min");
         const max = $("#id_preco_max");
@@ -79,19 +105,20 @@
             }
         });
 
-        const concat = (a, b) => Array.isArray(a) ? a.concat(b) : [a, b];
+        const form = $("#filtro, #pesquisar");
 
-        /*const form = $("main #filtro, main #pesquisar");
         form.submit(function (e) {
             e.preventDefault();
-            const data = [...new FormData(window.document.getElementById("filtro")), ...new FormData(window.document.getElementById("pesquisar"))]
-                .reduce((obj, [key, value]) => ({ ...obj, [key]: (key in obj ? concat(obj[key], value) : value) }), {});
+
+            const data = [...new FormData(window.document.getElementById("filtro")).entries(), ...new FormData(window.document.getElementById("pesquisar")).entries()];
 
             const url = new URL(window.location.href);
-            url.search = new URLSearchParams(data).toString();
-            console.log(data);
+            url.search = data.reduce((params, [key, value]) => {
+                params.append(key, value);
+                return params;
+            }, new URLSearchParams()).toString();
             window.location = url;
-        });*/
+        });
     });
-</script>
-{% endblock %}
+        </script>
+    {% endblock scripts %}

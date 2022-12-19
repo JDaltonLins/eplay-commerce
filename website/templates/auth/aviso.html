@@ -1,0 +1,25 @@
+{% extends "./../layout/index.html" %}
+{% load static %}
+{% block head %}
+    <style>
+    body {
+        height: 100vh;
+    }
+    </style>
+    <link rel="stylesheet" href="{% static 'css/auth.css' %}" />
+{% endblock head %}
+{% block bodyTags %}
+    page="info"{% endblock bodyTags %}
+    {% block mainTags %}
+        class="d-flex flex-column justify-center align-center"
+    {% endblock mainTags %}
+    {% block content %}
+        <div class="info-content m-auto bg-dark p-3 rounded">
+            <h5>Aviso!</h5>
+            {{ message|linebreaks }}
+            {% if button %}<a href="{{ button.url }}" class="btn btn-primary">{{ button.text }}</a>{% endif %}
+            {% if redirect %}<a href="{{ redirect }}" class="btn btn-primary">Voltar</a>{% endif %}
+        </div>
+    {% endblock content %}
+    {% block scripts %}
+    {% endblock scripts %}

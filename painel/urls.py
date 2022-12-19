@@ -4,10 +4,10 @@ from django.urls import path, include
 
 
 urlpatterns = [
-    path('/auth/login', render,
+    path('auth/login', render,
          {'template_name': 'auth/login.html'}, name='auth/login'),
-    path('/auth/logoff', render,
+    path('auth/logoff', render,
          {'template_name': 'auth/login.html'}, name='auth/logoff'),
-    path('/relatorios/', render,
+    path('relatorios/', render,
          {'template_name': 'auth/login.html'}, name='relatorios/'),
 ]

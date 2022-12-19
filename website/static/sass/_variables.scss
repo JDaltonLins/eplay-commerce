@@ -22,6 +22,22 @@ $theme-colors: (
 
 $body-bg: #212529;
 $body-color: #fff;
+$card-bg: lighten($body-bg, 5%);
+
+$component-active-bg: lighten($body-bg, 5%);
+
+$pagination-color: $body-color;
+$pagination-bg: lighten($body-bg, 10%);
+$pagination-border-color: lighten($body-bg, 15%);
+
+$pagination-focus-color: $body-color;
+$pagination-focus-bg: lighten($body-bg, 5%);
+
+
+$pagination-disabled-color: darken($body-color, 20%);
+$pagination-disabled-bg: $body-bg;
+$pagination-disabled-border-color: lighten($body-bg, 15%);
+
 
 /*@at-root: (
   "primary": $primary,

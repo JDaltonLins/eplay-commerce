@@ -1,9 +1,8 @@
+from django.conf import settings
 from django.contrib.auth.models import PermissionsMixin, AbstractUser
 from django.db import models
 
 from manager.managers.usuario import UsuarioManager
-import random
-import string
 
 from manager.managers.usuario import UsuarioManager
 from manager.managers.usuario_confirmacao import UsuarioConfirmacaoManager
@@ -15,7 +14,7 @@ class Usuario (AbstractUser, PermissionsMixin):
     color = models.CharField(max_length=6, default='000000')
     cargo = models.ForeignKey(
         'Cargo', on_delete=models.CASCADE, null=True, blank=True)
-    email_verified = models.BooleanField(default=False)
+    email_verified = models.BooleanField(default=settings.EMAIL_USE)
 
     objects = UsuarioManager()
 
@@ -26,6 +25,10 @@ class Usuario (AbstractUser, PermissionsMixin):
     def __str__(self):
         return self.get_username()
 
+    @property
+    def is_authenticated(self):
+        return True
+
 
 class UsuarioConfirmacao (models.Model):
     usuario = models.ForeignKey(
@@ -35,7 +38,11 @@ class UsuarioConfirmacao (models.Model):
     type = models.CharField(max_length=10)
     data = models.DateTimeField(auto_now_add=True)
 
-    object = UsuarioConfirmacaoManager()
+    objects = UsuarioConfirmacaoManager()
+    
+    def redefine(self):
+        token = random_token()
+        uid = random_uid()
 
 
 class Cargo (models.Model):

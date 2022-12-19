@@ -1,0 +1,16 @@
+{% extends "layout/index.html" %}
+{% load website_tags %}
+<!--  Listagem de categorias -->
+{% block content %}
+    <div class="container rounded p-3">
+        <div class="display-3">
+            <h1>Listagem de Categorias</h1>
+        </div>
+        <div class="d-flex flex-wrap text-white bg-dark border border-little p-2 gap-2">
+            {% for categoria in categorias %}
+                <a href="{% redirect_to 'produtos' categorias=categoria.id %}"
+                   class="text-white bg-deepdark text-decoration-none px-3 py-1 bg-dark border border-little rounded">{{ categoria.nome }}</a>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock content %}

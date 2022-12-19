@@ -1,39 +1,28 @@
 {% extends "./../layout/index.html" %}
 
-{% block head %}<style>
+{% load crispy_forms_tags %}
+{% load static %}
+{% load website_tags %}
+
+{% block head %}
+    <style>
     body {
         height: 100vh;
     }
-</style>{% endblock %}
+    </style>
+    <link rel="stylesheet" href="{% static 'css/auth.css' %}" />
+{% endblock head %}
 
-{% block mainTags %}class="d-flex flex-column margin-auto h-100"{% endblock %}
+{% block bodyTags %}page="login"{% endblock bodyTags %}
+{% block mainTags %}{% endblock mainTags %}
 
 {% block content %}
-<div class="row justify-content-center align-items-center h-100">
-    <div class="col-12 col-md-6 col-lg-4">
-        <div class="card">
-            <div class="card-body">
-                <h5 class="card-title">Login</h5>
-                <form method="POST" action="{% url 'auth/login' %}">
-                    {% csrf_token %}
-                    <div class="mb-3">
-                        <label for="username" class="form-label">Usuário</label>
-                        <input type="text" class="form-control" id="username" name="username" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="password" class="form-label">Senha</label>
-                        <input type="password" class="form-control" id="password" name="password" required>
-                    </div>
-                    <div class="mb-3 form-check">
-                        <input type="checkbox" class="form-check-input" id="remember" name="remember">
-                        <label class="form-check-label" for="remember">Lembrar-me</label>
-                    </div>
-                    <button type="submit" class="btn btn-primary">Entrar</button>
-                </form>
-            </div>
-        </div>
+    <div class="login-content">
+        <form method="post"
+              action="{% redirect_to 'auth/login' next=request.GET.next %}">
+            {% crispy form %}
+        </form>
     </div>
-</div>
-{% endblock %}
-
+{% endblock content %}
 {% block scripts %}
+{% endblock scripts %}

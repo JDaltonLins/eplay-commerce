@@ -1,0 +1,27 @@
+{% extends "layout/index.html" %}
+{% load crispy_forms_tags %}
+{% load humanize %}
+{% load static %}
+{% load website_tags %}
+{% block head %}
+    <link rel="stylesheet" href="{% static 'css/produtos.css' %}" />
+    <link rel="stylesheet"
+          href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.13.2/themes/smoothness/jquery-ui.css"/>
+{% endblock head %}
+{% block title %}
+    Produtos - ePlay Commerce
+{% endblock title %}
+{% block mainTags %}
+    class="container-fluid d-flex flex-column flex-sm-row"{% endblock mainTags %}
+    {% block content %}
+        <div class="d-flex gap-3">
+            {% for pedido in pedidos %}
+                <div class="pedido">
+                    <span>Id: {{ pedido.numero }}</span>
+                    <span>Valor: {{ pedido.valor|floatformat:2 }}</span>
+                    <span>Data: {{ pedido.data|date:"d/m/Y" }}</span>
+                    <span>Status: {{ pedido.status }}</span>
+                </div>
+            {% endfor %}
+        </div>
+    {% endblock content %}

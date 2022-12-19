@@ -1,9 +1,82 @@
-{% extends 'content/content.html' %}
-
+{% extends "layout/index.html" %}
+{% load static %}
+{% block head %}
+    <link href="{% static 'css/inicio.css' %}" rel="stylesheet" />
+{% endblock head %}
 {% block content %}
-
-Olá, mundo!
-
-Welcome to Brazil
-
-{% endblock %}
+    <div class="container px-5 py-4">
+        <div id="shower" class="d-flex flex-column gap-3">
+            {% with produtos|first as produto_primeiro %}
+                <div>
+                    <img src="{{ produto_primeiro.imagens.all.first.imagem.url }}"
+                         class="ratio visualizer d-block w-100 rounded border border-little"
+                         alt="{{ produto_primeiro.descricao }}"/>
+                    <div class="blur shadow-lg bg-deepdark rounded border border-little carousel-caption d-none d-md-block">
+                        <h5 class="title">{{ produto_primeiro.nome }}</h5>
+                        <p class="description">{{ produto_primeiro.descricao }}</p>
+                    </div>
+                </div>
+            {% endwith %}
+            <div class="col d-flex flex-row gap-3">
+                {% for item in produtos %}
+                    <a href="{% url 'produto' produto_id=item.id %}"
+                       data-imagem="{{ item.imagens.all.first.imagem.url }}"
+                       data-title="{{ item.nome }}"
+                       data-description="{{ item.descricao }}"
+                       class="text-decoration-none d-flex gap-1 p-2 bg-light rounded border border-little text-white bg-dark item-data flex-fill"
+                       aria-current="true">
+                        <img src="{{ item.imagens.all.first.imagem.url }}"
+                             alt="imagem do jogo"
+                             class="rounded-circle flex-shrink-0 icone border border-little"/>
+                        <div class="d-flex gap-2 w-100 align-items-center">
+                            <p class="mb-0">{{ item.nome }}</p>
+                        </div>
+                    </a>
+                {% endfor %}
+            </div>
+        </div>
+        <hr />
+        <div class="d-flex flex-column gap-2">
+            {% for categoria in categorias %}
+                <div class="card bg-dark border border-little">
+                    <div class="card-body">
+                        <h6 class="card-title">{{ categoria.nome }}</h6>
+                        <div class="d-flex flex-row gap-3">
+                            {% for produto in categoria.produto_set.all %}
+                                <a href="{% url 'produto' produto_id=produto.id %}">
+                                    <img width="120px"
+                                         height="120px"
+                                         src="{{ produto.imagens.all.first.imagem.url }}"
+                                         alt="{{ produto.descricao }}"
+                                         class="img-fluid rounded border border-little"/>
+                                </a>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock content %}
+{% block scripts %}
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+    <script>
+        (() => {
+            const visualizer = $($(".visualizer")[0]);
+            const items = $(".item-data"),
+              title = $(".title"),
+              description = $(".description");
+          
+            console.log(items, title, description);
+          
+            items.hover(function () {
+              const $el = $(this);
+              visualizer.one("load", () => {
+                title.text($el.attr("data-title"));
+                description.text($el.attr("data-description"));
+              });
+              visualizer.attr("src", $el.attr("data-imagem"));
+            });
+          })();
+    </script>
+{% endblock scripts %}

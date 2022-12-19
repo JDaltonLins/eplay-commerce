@@ -4,16 +4,13 @@ from django.urls import reverse
 
 from website.views.produtos import produto, procurar
 from website.views.auth import urlpatterns as auth_patterns
+from website.views.carrinho import urlpatterns as carrinho_patterns
+from website.views.produtos import urlpatterns as produtos_patterns
+from website.views.user import urlpatterns as user_patterns
 
+from website.views import render_index
 urlpatterns = [
-    path('', render, {'template_name': 'index.html'}, name='inicio'),
-    path('categorias/', render,
-         {'template_name': 'categorias.html'}, name='categorias'),
-    path('categorias/<int:categoria_id>/', render,
-         {'template_name': 'categoria.html'}),
-    path('produto/', procurar, name='produtos'),
-    path('produto/<int:produto_id>-<slug:raw_slug>', produto, name='produto'),
-    path('produto/<int:produto_id>', produto, name='produto'),
+    path('', render_index, name='home'),
     path('promocoes/', render,
          {'template_name': 'promocoes.html'}, name='promocoes'),
-] + auth_patterns
+] + auth_patterns + produtos_patterns + carrinho_patterns + user_patterns
