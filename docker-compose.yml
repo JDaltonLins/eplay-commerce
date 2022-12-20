@@ -6,6 +6,6 @@ services:
     build: .
     command: python manage.py runserver
     volumes:
-      - ".:."
+      - ".:/container"
     ports:
       - "8000:8000"

@@ -6,7 +6,7 @@
 # Copia do diretorio local para o container
 FROM python:3.12-rc-alpine3.17
 
-COPY . /
+COPY . /container/
 
 # Atualiza o sistema operacional
 RUN apk update && apk upgrade
@@ -18,6 +18,11 @@ RUN pip install --upgrade pip
 RUN apk add build-base tiff-dev jpeg-dev openjpeg-dev zlib-dev freetype-dev lcms2-dev \
     libwebp-dev tcl-dev tk-dev harfbuzz-dev fribidi-dev libimagequant-dev \
     libxcb-dev libpng-dev
+
+# Altera a pasta de acesso
+WORKDIR /container/
+
+ENV DJANGO_DEBUG=False
 
 # Instalação de dependências
 RUN pip install -r requirements.txt
