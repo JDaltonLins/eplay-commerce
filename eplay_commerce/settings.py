@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.humanize',
     "crispy_forms",
     "crispy_bootstrap5",
+    'livereload',
     "manager",
     "website",
     "painel"
@@ -54,6 +55,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'livereload.middleware.LiveReloadScript',
 ]
 
 ROOT_URLCONF = 'manager.urls'
@@ -149,3 +151,6 @@ EMAIL_HOST_USER = 'admin@jdaltonlins.com'
 EMAIL_HOST_PASSWORD = 'password'
 
 EMAIL_NO_REPLY = 'nao-responda@jdaltonlins.dev'
+
+# Live Reload
+LIVERELOAD_PORT = 35729

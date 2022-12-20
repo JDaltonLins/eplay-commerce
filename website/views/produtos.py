@@ -72,15 +72,14 @@ def procurar(req: HttpRequest) -> HttpResponse:
     return render(req, 'produtos.html', {
         "page": build_meta('Pesquisa de Produtos'),
         "form": form,
-        "paginacao": paginacao,
-        "produtos": produtos
+        "paginacao": paginacao
     })
 
 
 def categorias(req):
     return render(req, 'categorias.html', {
         'page': build_meta('Categorias'),
-        'categorias': Categoria.objects.filter(ativo=True)
+        'categorias': Categoria.objects.filter(ativo=True, produto__isnull=False)
     })
 
 

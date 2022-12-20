@@ -10,7 +10,8 @@ from manager.utils import random_token, random_uid
 
 
 class Usuario (AbstractUser, PermissionsMixin):
-    imagem = models.ImageField(upload_to='usuarios', blank=True)
+    imagem = models.ImageField(
+        upload_to='usuarios', default='usuarios/usuarios-default.svg')
     color = models.CharField(max_length=6, default='000000')
     cargo = models.ForeignKey(
         'Cargo', on_delete=models.CASCADE, null=True, blank=True)
@@ -39,7 +40,7 @@ class UsuarioConfirmacao (models.Model):
     data = models.DateTimeField(auto_now_add=True)
 
     objects = UsuarioConfirmacaoManager()
-    
+
     def redefine(self):
         token = random_token()
         uid = random_uid()

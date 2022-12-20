@@ -13,13 +13,10 @@
     <div class="collapse navbar-collapse" id="navbarNav">
       <ul class="navbar-nav ms-auto">
         <li class="nav-item">
-          <a class="nav-link" href="{% url 'categorias' %}">Categorias</a>
-        </li>
-        <li class="nav-item">
           <a class="nav-link" href="{% url 'produtos' %}">Produtos</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link disabled" href="{% url 'promocoes' %}">Promoções</a>
+          <a class="nav-link" href="{% url 'categorias' %}">Categorias</a>
         </li>
         <li class="nav-item">
           <a class="nav-link" href="{% url 'carrinho' %}">Carrinho</a>
@@ -28,14 +25,14 @@
           {% if request.user.is_authenticated %}
             <div class="flex-shrink-0 dropdown dropdown-center">
               <a href="#"
-                 class="link-dark text-decoration-none dropdown-toggle"
+                 class="link-dark text-decoration-none dropdown-toggle ms-3"
                  data-bs-toggle="dropdown"
                  aria-expanded="false">
-                <img src="https://github.com/mdo.png"
-                     alt="mdo"
+                <img src="{{ request.user.imagem.url }}"
+                     alt="{{ request.user.username }}"
                      width="32"
                      height="32"
-                     class="rounded-circle"/>
+                     class="rounded-circle bg-secondary"/>
               </a>
               <ul class="dropdown-menu dropdown-menu-dark text-small shadow">
                 <li>

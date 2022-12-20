@@ -23,6 +23,9 @@
         </div>
         <div class="products">
             <div class="search bg-dark rounded">
+                <div>
+                    Total de produtos: {{ paginacao.paginator.count }} ({{ paginacao.number }}/{{ paginacao.paginator.num_pages }} páginas)
+                </div>
                 <form id="pesquisar"
                       method="post"
                       class="form bg-dark text-white p-3 rounded">

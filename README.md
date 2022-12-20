@@ -12,9 +12,9 @@ O principio é realizar um pequeno projeto funcional de um site de vendas feito 
 
 ## 📝 Funcionalidades
 
-- [ ] Sistema de Autenticação
-- [ ] Pesquisa de Produtos
-- [ ] Configuração de Tag, Categoria, Subcategoria, Cupom
+- [X] Sistema de Autenticação
+- [X] Pesquisa de Produtos
+- [X] Configuração de Tag, Categoria, Subcategoria, Cupom
 - [ ] Painel Administrativo
 - [ ] Painel de Relatórios
 - [ ] Controle de Estoque

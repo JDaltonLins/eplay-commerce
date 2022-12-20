@@ -39,9 +39,9 @@ class FiltroProdutos (forms.Form):
         super().__init__(*args, **kwargs)
 
         self.fields['categorias'].choices = [
-            (c.id, c.nome) for c in Categoria.objects.filter(ativo=True).order_by(Length('nome'))]
+            (c.id, c.nome) for c in Categoria.objects.filter(ativo=True, produto__isnull=False).distinct().order_by(Length('nome'))]
         self.fields['tags'].choices = [(t.id, t.nome)
-                                       for t in Tag.objects.filter(ativo=True).order_by(Length('nome'))]
+                                       for t in Tag.objects.filter(ativo=True, produto__isnull=False).distinct().order_by(Length('nome'))]
         self.fields['q'].label = False
 
         max = Produto.objects.all().aggregate(Max('preco'))['preco__max']
