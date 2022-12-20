@@ -22,7 +22,8 @@ RUN apk add build-base tiff-dev jpeg-dev openjpeg-dev zlib-dev freetype-dev lcms
 # Altera a pasta de acesso
 WORKDIR /container/
 
-ENV DJANGO_DEBUG=False
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
 
 # Instalação de dependências
 RUN pip install -r requirements.txt
@@ -36,3 +37,5 @@ RUN python manage.py migrate
 # Realiza a população do banco de dados
 RUN python manage.py populate 100
 
+EXPOSE 8000
+STOPSIGNAL SIGTERM
