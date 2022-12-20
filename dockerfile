@@ -9,7 +9,7 @@ FROM python:3.12-rc-alpine3.17
 COPY . /
 
 # Atualiza o sistema operacional
-RUN apk update
+RUN apk update && apk upgrade
 
 # Atualiza o pip
 RUN pip install --upgrade pip
@@ -27,3 +27,7 @@ RUN python manage.py makemigrations
 
 # Aplicação das migrações
 RUN python manage.py migrate
+
+# Realiza a população do banco de dados
+RUN python manage.py populate
+
