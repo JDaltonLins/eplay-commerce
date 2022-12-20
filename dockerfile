@@ -29,5 +29,5 @@ RUN python manage.py makemigrations
 RUN python manage.py migrate
 
 # Realiza a população do banco de dados
-RUN python manage.py populate
+RUN python manage.py populate 100
 

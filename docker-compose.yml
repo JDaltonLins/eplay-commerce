@@ -4,8 +4,8 @@ services:
   # Serviço do django para rodar o projeto
   django_web:
     build: .
-    command: cd /app/ && python manage.py runserver
+    command: python manage.py runserver
     volumes:
-      - ".:/app/"
+      - ".:."
     ports:
       - "8000:8000"
