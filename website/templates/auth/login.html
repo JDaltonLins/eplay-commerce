@@ -1,9 +1,7 @@
 {% extends "./../layout/index.html" %}
-
 {% load crispy_forms_tags %}
 {% load static %}
 {% load website_tags %}
-
 {% block head %}
     <style>
     body {
@@ -12,17 +10,17 @@
     </style>
     <link rel="stylesheet" href="{% static 'css/auth.css' %}" />
 {% endblock head %}
-
-{% block bodyTags %}page="login"{% endblock bodyTags %}
-{% block mainTags %}{% endblock mainTags %}
-
-{% block content %}
-    <div class="login-content">
-        <form method="post"
-              action="{% redirect_to 'auth/login' next=request.GET.next %}">
-            {% crispy form %}
-        </form>
-    </div>
-{% endblock content %}
-{% block scripts %}
-{% endblock scripts %}
+{% block bodyTags %}
+    page="login"{% endblock bodyTags %}
+    {% block mainTags %}{% endblock mainTags %}
+    {% block content %}
+        <div class="login-content">
+            <form method="post"
+                  action="{% redirect_to 'auth/login' next=request.GET.next %}">
+                {% crispy form %}
+                <a href="{% redirect_to 'auth/register' next=request.GET.next %}">Criar um novo cadastro</a>
+            </form>
+        </div>
+    {% endblock content %}
+    {% block scripts %}
+    {% endblock scripts %}

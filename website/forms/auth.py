@@ -1,7 +1,7 @@
 from django import forms
 from manager.models.usuario import Usuario
 from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Layout, Submit
+from crispy_forms.layout import Layout, Submit, Field
 
 
 class LoginForm(forms.Form):
@@ -30,17 +30,19 @@ class RegistrarForm(forms.ModelForm):
     email = forms.CharField(label='Email', max_length=100)
     first_name = forms.CharField(label='Nome', max_length=100)
     last_name = forms.CharField(label='Sobrenome', max_length=100)
+    cpf = forms.CharField(label='CPF', max_length=14)
 
     def __init__(self, *args, **kwargs):
         super(RegistrarForm, self).__init__(*args, **kwargs)
         self.helper = FormHelper()
         self.helper.layout = Layout(
+            'first_name',
+            'last_name',
+            'email',
+            Field('cpf', data_mask='000.000.000-00'),
             'username',
             'password',
             'password2',
-            'email',
-            'first_name',
-            'last_name',
             Submit('submit', 'Registrar', css_class='btn btn-primary')
         )
 
@@ -54,8 +56,8 @@ class RegistrarForm(forms.ModelForm):
     class Meta:
         model = Usuario
         fields = ['username', 'password',
-                  'first_name', 'last_name', 'email']
-
+                  'first_name', 'last_name', 'email', 'cpf']
+      
 
 class ChangeEmailForm(forms.Form):
     email = forms.CharField(

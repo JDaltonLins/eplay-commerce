@@ -154,3 +154,10 @@ cython_debug/
 media
 node_modules
 .static
+
+.vscode
+
+static
+media
+db_media
+data

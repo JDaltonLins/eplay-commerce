@@ -47,11 +47,9 @@
                             </div>
                         </div>
                         <div class="preco">
-                            {% if 1 %}
-                                <p class="desconto bage text-white">{{ produto.desconto }}%</p>
-                                <del class="preco-antigo text-white">
-                                    R$ {{ produto.preco|floatformat:2|intcomma }}
-                                </del>
+                            {% if produto.desconto %}
+                                <p class="desconto bage text-white">{{ produto.porcentagem|floatformat:0 }}%</p>
+                                <p class="preco-antigo text-white">R$ {{ produto.preco|floatformat:2|intcomma }}</p>
                             {% endif %}
                             {% if produto.preco_liquido == 0 %}
                                 <p class="preco-novo text-white">Grátis</p>

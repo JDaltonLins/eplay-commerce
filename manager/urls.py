@@ -16,7 +16,19 @@ urlpatterns = [
     path('auth/verify/<str:type>/<str:token>/<str:uid>', on_verify_email),
     path('admin/', admin.site.urls),
     path('painel/', include(painel_urls)),
-] \
-    + website_urls \
-    + [re_path('^' + MEDIA_URL + 'usuarios/usuarios-default.svg$', lambda req: redirect('/static/img/usuarios-default.svg'))] \
-    + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+] + website_urls
+
+
+if settings.DEBUG:
+    urlpatterns += [re_path('^' + MEDIA_URL + 'usuarios/usuarios-default.svg$',
+                            lambda req: redirect('/static/img/usuarios-default.svg'))]
+    urlpatterns += static(settings.STATIC_URL,
+                          document_root=settings.STATIC_ROOT)
+    urlpatterns += static(settings.MEDIA_URL,
+                          document_root=settings.MEDIA_ROOT)
+else:
+    # handler400 = 'website.views.error.bad_request'
+    # handler403 = 'website.views.error.permission_denied'
+    # handler404 = 'website.views.error.not_found'
+    # handler500 = 'website.views.error.server_error'
+    pass

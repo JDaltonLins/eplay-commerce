@@ -30,7 +30,7 @@ def build_url(page, args=None, search_params={}):
 
 
 def redirect_to(req: HttpRequest, page, **extra_fields):
-    search_params = _contact_dicts(req.GET.dict(), extra_fields) if req else {}
+    search_params = _contact_dicts(req.GET.dict(), extra_fields) if req else {} if req else {}
 
     page, args = page if type(page) in (list, tuple) else (page, [])
 

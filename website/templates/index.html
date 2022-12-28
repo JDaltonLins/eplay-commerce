@@ -4,8 +4,8 @@
     <link href="{% static 'css/inicio.css' %}" rel="stylesheet" />
 {% endblock head %}
 {% block content %}
-    <div class="container px-5 py-4">
-        <div id="shower" class="d-flex flex-column gap-3">
+    <div class="container px-5 py-4 d-flex flex-column">
+        <div id="shower" class="d-flex flex-row gap-3 mx-auto">
             {% with produtos|first as produto_primeiro %}
                 <div>
                     <img src="{{ produto_primeiro.imagens.all.first.imagem.url }}"
@@ -17,7 +17,7 @@
                     </div>
                 </div>
             {% endwith %}
-            <div class="col d-flex flex-row gap-3">
+            <div class="d-flex flex-column gap-3">
                 {% for item in produtos %}
                     <a href="{% url 'produto' produto_id=item.id %}"
                        data-imagem="{{ item.imagens.all.first.imagem.url }}"

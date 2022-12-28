@@ -1,93 +1,218 @@
 (() => {
     "strict";
 
-    const produto = (() => {
-        const produtoScript = document.getElementById("produto-data");
-        if (!produtoScript)
-            return;
-        return JSON.parse(produtoScript.innerHTML);
-    })();
+    /*
+        Endpoints para o carrinho:
+        - api/carrinho/remover (POST) - Remove um item do carrinho {produto_id}
+        - api/carrinho/adicionar (POST) - Adiciona um item ao carrinho {produto_id, quantidade}
+        - api/carrinho/limpar (POST) - Limpa o carrinho
+    */
 
-    const estoque = document.querySelector("#carrinho");
-
-    function $addItem(cart, id, name, image, price, qnt, url) {
-        cart.produtos[id] = { name, image, amount: qnt, price, url };
-
-        if (produto && produto.sku in cart.produtos)
-            estoque.innerHTML = qnt;
+    function clickAction(e, el, action) {
+        e.preventDefault();
+        el.setAttribute("disabled", true);
+        action().finally(() => el.removeAttribute("disabled"));
     }
 
-    function getItem(id) {
-        return openTransaction((cart) => id in cart.produtos ? cart.produtos[id] : null);
+
+    function defineValue(value) {
+        if ((a = document.getElementById("carrinho-contador"))) {
+            a.innerHTML = value;
+        }
     }
 
-    function addItem(id, name, image, price, qnt, url) {
-        openTransaction((cart) => $addItem(cart, id, name, image, price, qnt, url));
+    async function tratar(res) {
+        if (res.status === 401) {
+            Swal.fire({
+                title: "Erro",
+                text: "Você precisa estar logado para adicionar um produto ao carrinho!",
+                icon: "error",
+                color: "#fff",
+                background: "#323232",
+            });
+        } else {
+            try {
+                const json = await res.json();
+                Swal.fire({
+                    title: "Erro",
+                    text: Object.values(json).join("\n"),
+                    icon: "error",
+                    color: "#fff",
+                    background: "#323232",
+                });
+            } catch (e) {
+                Swal.fire({
+                    title: "Erro",
+                    text: "Ocorreu um erro ao adicionar o produto ao carrinho!",
+                    icon: "error",
+                    color: "#fff",
+                    background: "#323232",
+                });
+            }
+        }
     }
 
-    function removeItem(id) {
-        openTransaction((cart) => cart.produtos[id] && delete cart.produtos[id]);
+    function data() {
+        return [...new FormData(document.getElementById("csfr"))].reduce((acc, [key, value]) => {
+            acc[key] = value;
+            return acc;
+        }, {});
     }
 
-    async function openTransaction(func) {
-        var cart = JSON.parse(localStorage.getItem("cart")) ?? { produtos: {} };
-        if (cart == null || !'produtos' in cart) cart = { produtos: {} };
-        rs = await func(cart);
-        localStorage.setItem("cart", JSON.stringify(cart));
-        return rs;
-    }
-
-    if (!produto)
-        return;
-
-    const btn = document.querySelector(".btn-cart");
-
-    if (btn) {
-        btn.addEventListener("click", (e) => {
+    if (form = document.getElementById("csfr")) {
+        form.addEventListener("submit", (e) => {
             e.preventDefault();
-            const qnt = parseInt(document.querySelector("#quantidade").value);
+        });
+    }
 
-            openTransaction(async (cart) => {
-                let { sku: id, name, imagem, offers: { price, url } } = produto;
+    async function makeRequest(method, body) {
+        return fetch(`/api/carrinho/${method}`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json; charset=utf-8",
+                'X-CSRFToken': data()['csrfmiddlewaretoken']
+            },
+            credentials: "include",
+            ...(body && { body: JSON.stringify(body) }),
+        })
+    }
 
-                const noCarrinho = await getItem(id);
-
-                if (noCarrinho) {
-                    return Swal.fire({
+    async function addItem(id, qnt, force = false) {
+        return makeRequest("add", { id, quantidade: qnt, force }).then(async (res) => {
+            if (res.status === 200) {
+                rs = await res.json();
+                if (rs.status === 'success') {
+                    Swal.fire({
+                        title: "Produto adicionado",
+                        text: "Produto adicionado com sucesso!",
+                        icon: "success",
+                        color: "#fff",
+                        background: "#323232",
+                    });
+                    defineValue(rs.quantidade);
+                } else {
+                    Swal.fire({
                         title: "Produto já adicionado",
-                        text: "Você já adicionou esse produto ao carrinho, deseja adicionar mais uma unidade?\nAtualmente você tem " + cart.produtos[id].amount + " unidades desse produto no carrinho.",
+                        text: "Você já adicionou esse produto ao carrinho, deseja adicionar mais uma unidade?\nAtualmente você tem " + rs['quantidade'] + " unidades desse produto no carrinho.",
                         icon: "question",
                         showCancelButton: true,
                         confirmButtonText: "Sim",
                         cancelButtonText: "Não",
                         color: "#fff",
                         background: "#323232",
-                    }).then((result) => {
+                    }).then(async (result) => {
                         if (result.isConfirmed) {
-                            $addItem(cart, id, name, imagem, price, noCarrinho.amount + qnt, url);
-
-                            Swal.fire({
-                                title: "Produto adicionado",
-                                text: "Produto adicionado com sucesso!",
-                                icon: "success",
-                                color: "#fff",
-                                background: "#323232",
-                            });
+                            await addItem(id, qnt, true);
                         }
                     });
-                } else {
-                    $addItem(cart, id, name, imagem, price, qnt, url);
                 }
-            });
-        });
-    }
-
-    if (estoque && produto) {
-        openTransaction((cart) => {
-            if (produto.sku in cart.produtos) {
-                estoque.innerHTML = cart.produtos[produto.sku].amount;
+            } else {
+                await tratar(res);
             }
         });
     }
+
+    async function removeItem(id) {
+        return fetch("/api/carrinho/rem", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                'X-CSRFToken': data()['csrfmiddlewaretoken']
+            },
+            credentials: "include",
+            body: JSON.stringify({
+                id: id,
+            })
+        }).then(async (res) => {
+            if (res.status === 200) {
+                rs = await res.json();
+                if (rs.status === 'success') {
+                    await Swal.fire({
+                        title: "Produto removido",
+                        text: "Produto removido com sucesso!",
+                        icon: "success",
+                        color: "#fff",
+                        background: "#323232",
+                    });
+                    defineValue(rs.quantidade);
+                } else {
+                    await Swal.fire({
+                        title: "Error",
+                        text: "Produto já foi removido ou não existe!",
+                        icon: "error",
+                        color: "#fff",
+                        background: "#323232",
+                    });
+                }
+            } else {
+                await tratar(res);
+                return false;
+            }
+            return true;
+        });
+    }
+
+    async function clearCart() {
+        return fetch("/api/carrinho/clear", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                'X-CSRFToken': data()['csrfmiddlewaretoken']
+            },
+            credentials: "include"
+        }).then(async (res) => {
+            if (res.status === 200) {
+                rs = await res.json();
+                if (rs.status === 'success') {
+                    Swal.fire({
+                        title: "Carrinho limpo",
+                        text: "Carrinho limpo com sucesso!",
+                        icon: "success",
+                        color: "#fff",
+                        background: "#323232",
+                    });
+                    defineValue(0);
+                } else {
+                    Swal.fire({
+                        title: "Error",
+                        text: "Carrinho já está vazio!",
+                        icon: "error",
+                        color: "#fff",
+                        background: "#323232",
+                    });
+                }
+            } else {
+                await tratar(res);
+                return false;
+            }
+            return true;
+        });
+    }
+
+    if ((btn = document.getElementById("cart-clear"))) {
+        btn.addEventListener("click", (e) => clickAction(e, btn, () => clearCart()));
+    }
+
+    for (let btnRemove of document.getElementsByClassName("remover-produto")) {
+        btnRemove.addEventListener("click", (e) => clickAction(e, btnRemove, async () => {
+            const elemento = await removeItem(btnRemove.dataset.id);
+            if (elemento && btnRemove.dataset.redirect) {
+                window.location.href = window.location.href;
+            }
+        }));
+    }
+
+    if ((btn = document.getElementById("cart-add"))) {
+        const produto = (() => {
+            const produtoScript = document.getElementById("produto-data");
+            if (!produtoScript)
+                return;
+            return JSON.parse(produtoScript.innerHTML);
+        })();
+        if (!produto)
+            return;
+        btn.addEventListener("click", e => clickAction(e, btn, () => addItem(produto.sku, parseInt(document.getElementById("produto-qnt").value))));
+    }
+
 
 })();

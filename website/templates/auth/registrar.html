@@ -1,9 +1,7 @@
 {% extends "./../layout/index.html" %}
-
 {% load crispy_forms_tags %}
 {% load static %}
 {% load website_tags %}
-
 {% block head %}
     <style>
     body {
@@ -12,17 +10,21 @@
     </style>
     <link rel="stylesheet" href="{% static 'css/auth.css' %}" />
 {% endblock head %}
-
-{% block mainTags %}{% endblock mainTags %}
-{% block bodyTags %}page="register"{% endblock bodyTags %}
-
-{% block content %}
-    <div class="register-content">
-        <form method="post"
-              action="{% redirect_to 'auth/register' next=request.GET.next %}">
-            {% crispy form %}
-        </form>
-    </div>
-{% endblock content %}
-{% block scripts %}
-{% endblock scripts %}
+{% block mainTags %}
+{% endblock mainTags %}
+{% block bodyTags %}
+    page="register"{% endblock bodyTags %}
+    {% block content %}
+        <div class="register-content">
+            <form method="post"
+                  action="{% redirect_to 'auth/register' next=request.GET.next %}">
+                {% crispy form %}
+            </form>
+        </div>
+    {% endblock content %}
+    {% block scripts %}
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/jquery-mask-plugin@1.14.16/dist/jquery.mask.min.js"
+                integrity="sha256-Kg2zTcFO9LXOc7IwcBx1YeUBJmekycsnTsq2RuFHSZU="
+                crossorigin="anonymous"></script>
+    {% endblock scripts %}

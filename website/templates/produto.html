@@ -1,5 +1,6 @@
 {% extends "layout/index.html" %}
 {% load static %}
+{% load humanize %}
 {% block head %}
     <link rel="stylesheet"
           href="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.8/dist/sweetalert2.min.css"
@@ -77,26 +78,40 @@
                             </span>
                         {% endif %}
                         <p class="card-text slogan">{{ produto.slogan }}</p>
-                        <p class="card-text">R$ {{ produto.preco }}</p>
+                        <div class="preco">
+                            {% if produto.desconto %}
+                                <p class="desconto bage text-white">{{ produto.porcentagem|floatformat:0 }}%</p>
+                                <p class="preco-antigo text-white">R$ {{ produto.preco|floatformat:2|intcomma }}</p>
+                            {% endif %}
+                            {% if produto.preco_liquido == 0 %}
+                                <p class="preco-novo text-white">Grátis</p>
+                            {% else %}
+                                <p class="preco-novo text-white">R$ {{ produto.preco_liquido|floatformat:2|intcomma }}</p>
+                            {% endif %}
+                        </div>
                         <div class="form-group pb-1">
                             <label for="quantidade">Quantidade</label>
                             <input type="number"
                                    class="form-control"
-                                   id="quantidade"
+                                   id="produto-qnt"
                                    value="1"
                                    min="1"
                                    max="{{ produto.estoque }}"/>
                         </div>
                         <span class="pb-2">
                             <span class="d-inline-block badge rounded-pill text-bg-secondary">Estoque: <span class="badge rounded-pill text-bg-danger">{{ produto.estoque }}</span></span>
-                            <span class="d-inline-block badge rounded-pill text-bg-secondary">Carrinho: <span id="carrinho" class="badge rounded-pill text-bg-danger">0</span></span>
+                            <span class="d-inline-block badge rounded-pill text-bg-secondary">Carrinho: <span id="carrinho-contador" class="badge rounded-pill text-bg-danger">{{ carrinho }}</span></span>
                         </span>
-                        <a class="btn btn-primary btn-cart">Adicionar ao Carrinho</a>
+                        <a id="cart-add" class="btn btn-primary btn-cart">Adicionar ao Carrinho</a>
+                        {% csrf_token %}
                     </div>
                 </div>
             </div>
         </div>
     </div>
+    <form id="csfr">
+        {% csrf_token %}
+    </form>
 {% endblock content %}
 {% block scripts %}
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.8/dist/sweetalert2.min.js"

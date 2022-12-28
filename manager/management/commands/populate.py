@@ -43,10 +43,13 @@ class Command(BaseCommand):
         [thumbnail, header] = [settings.MEDIA_ROOT /
                                'produtos' / file for file in files]
 
-        request.urlretrieve(
-            f"https://cdn.cloudflare.steamstatic.com/steam/apps/{appid}/hero_capsule.jpg", thumbnail)
-        request.urlretrieve(
-            f"https://cdn.cloudflare.steamstatic.com/steam/apps/{appid}/capsule_616x353.jpg", header)
+        try:
+            request.urlretrieve(
+                f"https://cdn.cloudflare.steamstatic.com/steam/apps/{appid}/hero_capsule.jpg", thumbnail)
+            request.urlretrieve(
+                f"https://cdn.cloudflare.steamstatic.com/steam/apps/{appid}/capsule_616x353.jpg", header)
+        except Exception as e:
+            raise e
 
         return ['produtos/' + file for file in files]
 
@@ -88,6 +91,7 @@ class Command(BaseCommand):
         self.stdout.write(self.style.NOTICE(
             f'🌐 | Baixando imagens para {n} produtos...'))
         # Irá baixar em paralelo as imagens
+
         with futures.ThreadPoolExecutor() as executor:
             executor.map(Command.put_asserts, data)
 
@@ -117,7 +121,7 @@ class Command(BaseCommand):
             }
 
         with transaction.atomic():
-            produtos = dict(zip([game['appid'] for game in data], Produto.objects.bulk_create([
+            Produto.objects.bulk_create([
                 Produto(
                     nome=game['name'],
                     slogan=f'Venha curtir o {game["name"]}',
@@ -126,10 +130,10 @@ class Command(BaseCommand):
                     estoque=random.randint(5, 100),
                     preco=float(game['price']) * 5.30,
                     thumbnail=game['assets'][0],
-                ) for game in data])))
+                ) for game in data])
 
             for game in data:
-                produto = produtos[game['appid']]
+                produto = Produto.objects.get(nome=game['name'])
                 produto.imagens.add(*[first_imagens[game['appid']]] + [ProdutoImagem.objects.create(
                     imagem=game['assets'][1]) for _ in range(random.randint(0, 5))])
                 produto.categorias.add(*[categorias[tag]

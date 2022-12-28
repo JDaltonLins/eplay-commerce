@@ -4,7 +4,7 @@ from django.shortcuts import redirect, render
 from django.http import HttpRequest, HttpResponse
 
 from manager.models import Produto
-from manager.models.produtos import Categoria
+from manager.models.produtos import CarrinhoItem, Categoria
 from website.forms.produtos import FiltroProdutos
 from website.utils import build_meta, redirect_current, redirect_to
 
@@ -26,6 +26,13 @@ def produto(req: HttpRequest, produto_id: int, raw_slug: str = '') -> HttpRespon
         if produto.data_lancamento and produto.data_lancamento > timezone.now() and not (req.user and req.user.is_staff):
             return redirect_to(req, 'inicio')
 
+        carrinho = CarrinhoItem.objects.filter(
+            user=req.user, produto=produto).first() if req.user.is_authenticated else None
+        if carrinho:
+            carrinho = carrinho.quantidade
+        else:
+            carrinho = 0
+
         return render(req, 'produto.html', {
             'page': {
                 'title': f"{produto.nome} - ePlay Commerce",
@@ -34,6 +41,7 @@ def produto(req: HttpRequest, produto_id: int, raw_slug: str = '') -> HttpRespon
                 'author': 'Dalton Lins, Jussara Kelly - Equipe ePlay Commerce'
             },
             'produto': produto,
+            'carrinho': carrinho,
             'produto_meta': json.dumps({
                 "@context": "https://schema.org",
                 "@type": "Product",
@@ -43,10 +51,10 @@ def produto(req: HttpRequest, produto_id: int, raw_slug: str = '') -> HttpRespon
                 'imagem': f"{req.scheme}://{req.get_host()}{produto.thumbnail.url}",
                 "offers": {
                     "@type": "Offer",
-                    "availability": "https://schema.org/InStock",
+                    "availability":  "https://schema.org/InStock" if produto.estoque > 0 else "https://schema.org/OutOfStock",
                     "price": intcomma(produto.preco),
                     "priceCurrency": "BRL",
-                    "url": f"{req.scheme}://{req.get_host()}{reverse('produto', kwargs={'produto_id': produto.id, 'raw_slug': produto.slug})}"
+                    "url": f"{req.scheme}://{req.get_host()}{reverse('produto', kwargs={'produto_id': produto.id})}"
                 }
             })
         })
@@ -79,7 +87,7 @@ def procurar(req: HttpRequest) -> HttpResponse:
 def categorias(req):
     return render(req, 'categorias.html', {
         'page': build_meta('Categorias'),
-        'categorias': Categoria.objects.filter(ativo=True, produto__isnull=False)
+        'categorias': Categoria.objects.filter(ativo=True, produto__isnull=False).distinct()
     })
 
 

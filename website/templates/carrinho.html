@@ -1,0 +1,83 @@
+{% extends "layout/index.html" %}
+{% load website_tags %}
+{% load humanize %}
+{% load static %}
+{% block head %}
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.8/dist/sweetalert2.min.css"
+          integrity="sha256-sWZjHQiY9fvheUAOoxrszw9Wphl3zqfVaz1kZKEvot8="
+          crossorigin="anonymus"/>
+    
+{% endblock head %}
+<!--  Listagem os itens do pedido, com um header contendo as informações de total, quantidade, e produtos -->
+{% block content %}
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <h1>Meu Carrinho</h1>
+                <hr/>
+                <div class="row">
+                    <div class="col-md-12">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Produto</th>
+                                    <th>Quantidade</th>
+                                    <th>Preço</th>
+                                    <th>Desconto</th>
+                                    <th>Total</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in itens.all %}
+                                    <tr>
+                                        <td>
+                                            <a href="{% url 'produto' produto_id=item.produto.id %}">{{ item.produto.nome }}</a>
+                                        </td>
+                                        <td>{{ item.quantidade }}</td>
+                                        <td>R$ {{ item.preco_bruto|floatformat:2|intcomma }}</td>
+                                        <td>R$ {{ item.preco_desconto|floatformat:2|intcomma }}</td>
+                                        <td>R$ {{ item.total|floatformat:2|intcomma }}</td>
+                                        <td>
+                                            <button class="btn btn-danger btn-sm remover-produto"
+                                                    data-id="{{ item.produto.id }}"
+                                                    data-redirect="true">
+                                                <svg xmlns="http://www.w3.org/2000/svg"
+                                                     xmlns:xlink="http://www.w3.org/1999/xlink"
+                                                     width="20px"
+                                                     height="20px"
+                                                     viewBox="0 0 20 20"
+                                                     version="1.1">
+                                                    <path d="M 5.1875 15.6875 L 4.3125 14.8125 L 9.125 10 L 4.3125 5.1875 L 5.1875 4.3125 L 10 9.125 L 14.8125 4.3125 L 15.6875 5.1875 L 10.875 10 L 15.6875 14.8125 L 14.8125 15.6875 L 10 10.875 Z M 5.1875 15.6875 "/>
+                                                </svg>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <td colspan="2" class="text-right">Total</td>
+                                    <td>R$ {{ info.total.bruto|floatformat:2|intcomma }}</td>
+                                    <td>R$ {{ info.total.desconto|floatformat:2|intcomma }}</td>
+                                    <td>R$ {{ info.total.liquido|floatformat:2|intcomma }}</td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                    <a id="finalizar" class="btn btn-primary">Finalizar Compra</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <form id="csfr">
+        {% csrf_token %}
+    </form>
+{% endblock content %}
+{% block scripts %}
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.8/dist/sweetalert2.min.js"
+            integrity="sha256-Hwfn4rHzN55PApkU+MW1HDu4MjBqBMtKEf6YRi2of2Q="
+            crossorigin="anonymous"></script>
+    <script src="{% static 'js/cart.js' %}"></script>
+{% endblock scripts %}

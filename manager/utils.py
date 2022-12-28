@@ -1,6 +1,8 @@
 from django.http import HttpResponse, JsonResponse, HttpResponseNotAllowed
 from django.utils import timezone
 from django.contrib.sessions.models import Session
+from django.contrib.auth import REDIRECT_FIELD_NAME
+from django.contrib.auth.decorators import user_passes_test
 
 import json
 import random
@@ -28,14 +30,22 @@ def json(func):
 
 
 def required_login(required=True, required_email=True, redirect=None):
+    
     def decorator(func):
         def wrapper(request, *args, **kwargs):
             if request.user.is_authenticated != required or (required_email and not request.user.email_verified):
-                return redirect_to(request, **redirect) if redirect else HttpResponse(status=401)
+                return HttpResponse(status=401) # redirect_to(request, **redirect) if redirect else HttpResponse(status=401)
             return func(request, *args, **kwargs)
         return wrapper
     return decorator
 
+def login_required(required=True, required_email=True, redirect='auth/login'):
+    actual_decorator = user_passes_test(
+        lambda u: u.is_authenticated == required and (not required_email or u.email_verified),
+        login_url=redirect_to(None, **redirect),
+        redirect_field_name=REDIRECT_FIELD_NAME,
+    )
+    return actual_decorator
 
 def admin_required(func):
     def wrapper(request, *args, **kwargs):

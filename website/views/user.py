@@ -5,11 +5,15 @@ from eplay_commerce.settings import MEDIA_URL
 from manager.models.produtos import Pedido
 from manager.models.usuario import Usuario
 
-from manager.utils import required_login
 from website.forms.user import SettingsForm
 from website.utils import build_meta
 
+from django.contrib.auth.decorators import login_required
+from django.views.decorators.http import require_http_methods
 
+
+@require_http_methods(['GET', 'POST'])
+@login_required
 def settings(req):
     if req.method == 'POST':
         form = SettingsForm(req.POST, req.FILES, instance=req.user)
@@ -19,24 +23,23 @@ def settings(req):
     else:
         form = SettingsForm(instance=req.user)
 
-    return render(req, {
-        'page': build_meta('Configuarações'),
+    return render(req, 'user/config.html', {
+        'page': build_meta('Configurações'),
         'form': form
     })
 
 
-@required_login
+@require_http_methods(['GET'])
+@login_required
 def orders(req):
-    return render(req, {
-        'page': {
-            'title': 'Meus pedidos - ePlay Commerce',
-            'author': 'Dalton Lins e Jussara Kelly - Equipe ePlay Commerce',
-        },
-        'pedidos': Pedido.objects.filter(dono=req.user)
+    pedidos = Pedido.objects.filter(user=req.user)
+    return render(req, 'pedidos.html', {
+        'page': build_meta('Pedidos', 'Pedidos realizados'),
+        'pedidos': pedidos,
     })
 
 
 urlpatterns = [
-    path('user/settings', settings, name='user/settings'),
-    path('user/orders', orders, name='user/orders')
+    path('user/configuracao', settings, name='user/settings'),
+    path('user/pedidos', orders, name='user/orders')
 ]

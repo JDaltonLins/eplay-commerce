@@ -17,6 +17,9 @@ def upload_to_path(instance: 'ProdutoImagem', filename: str):
 
 
 class Produto (models.Model):
+    ativo = models.BooleanField(default=True, verbose_name='Ativo')
+    mostrar_inicio = models.BooleanField(
+        default=True, verbose_name='Mostrar na página inicial')
     nome = models.CharField(max_length=100)
     slug = models.SlugField(max_length=100, blank=True, default='')
     slogan = models.CharField(max_length=100, blank=True, default='')
@@ -29,58 +32,37 @@ class Produto (models.Model):
     imagens = models.ManyToManyField(
         'ProdutoImagem', blank=True, related_name='produto')
 
-    categorias = models.ManyToManyField('Categoria')
-    tags = models.ManyToManyField('Tag')
+    categorias = models.ManyToManyField('Categoria', blank=False)
+    tags = models.ManyToManyField('Tag', blank=True)
     estoque = models.IntegerField(default=0)
 
-    ativo = models.BooleanField(default=True)
-
     created_at = models.DateTimeField(auto_now_add=True)
-    mostrar_inicio = models.BooleanField(default=True)
-
-    # Define um atributo padrão para um novo produto, para que o slug seja gerado a partir do nome
-    def save(self, *args, **kwargs):
-        if not self.slug:
-            self.slug = slugify(self.nome)
-        super().save(*args, **kwargs)
-
-    def desconto(self):
-        # Verifica se há algum desconto com o PedidoDesconto aplicado ao produto ou então se há um desconto padrão
-        desconto = PedidoDescontoProduto.objects.filter(
-            produto=self,
-            desconto__ativo=True,
-        ).filter(
-            Q(desconto__inicio__lte=timezone.now()) | Q(
-                desconto__inicio__isnull=True),
-            Q(desconto__fim__gte=timezone.now()) | Q(
-                desconto__fim__isnull=True)
-        )
-        # Raw query para verificar se há algum desconto com o PedidoDesconto aplicado ao produto ou então se há um desconto padrão
-        if not desconto:
-            descontos = PedidoDesconto.objects.filter(
-                ativo=True
-            ).filter(
-                Q(inicio__lte=timezone.now()) | Q(
-                    inicio__isnull=True),
-                Q(fim__gte=timezone.now()) | Q(
-                    fim__isnull=True)
-            ).filter(pedidodescontotag__id__in=(0, 1, 2, 3)) \
-                .filter(pedidodescontocategoria__id__in=(0, 1, 2, 3)) \
-                .filter(pedidodescontosubcategoria__id__in=(0, 1, 2, 3)) \
-                .filter(pedidodescontoproduto__id__in=(0, 1, 2, 3))
-
-            for desconto in descontos:
-                if not desconto.pedidodescontoproduto_set.filter(produto=self.categoria).exists():
-                    return desconto.desconto
-
-    def preco_liquido(self):
-        return float(self.preco) * 0.9
-
-    def desconto(self):
-        return 10
 
     def __str__(self):
         return self.nome
+
+    # Define um atributo padrão para um novo produto, para que o slug seja gerado a partir do nome
+    def save(self, *args, **kwargs):
+        if not self.slug or self.slug == '':
+            self.slug = slugify(self.nome)
+        super().save(*args, **kwargs)
+
+    def preco_liquido(self, desconto=0):
+        preco = self.preco
+        desconto = self.desconto() if desconto == 0 else desconto
+        return desconto.calcular_preco(preco) if desconto else preco
+
+    def desconto_preco(self, desconto=0):
+        preco = self.preco
+        desconto = self.desconto() if desconto == 0 else desconto
+        return desconto.calcular(preco) if desconto else 0
+
+    def porcentagem(self):
+        desconto = self.desconto()
+        return desconto.porcentagem(self) if desconto else 0
+
+    def desconto(self):
+        return PedidoDesconto.objects.procurar_desconto(self)
 
 
 class ProdutoImagem (models.Model):
@@ -88,7 +70,7 @@ class ProdutoImagem (models.Model):
 
 
 class Categoria (models.Model):
-    nome = models.CharField(max_length=100)
+    nome = models.CharField(max_length=100, unique=True)
     slug = models.SlugField(max_length=100, blank=True, default='')
     ativo = models.BooleanField(default=True)
     mostrar_inicio = models.BooleanField(default=True)
@@ -105,7 +87,7 @@ class Categoria (models.Model):
 
 
 class Tag (models.Model):
-    nome = models.CharField(max_length=100)
+    nome = models.CharField(max_length=100, unique=True)
     ativo = models.BooleanField(default=True)
 
     def __str__(self):
@@ -113,43 +95,57 @@ class Tag (models.Model):
 
 
 class Pedido(models.Model):
+    user = models.ForeignKey('Usuario', on_delete=models.CASCADE)
     valor = models.DecimalField(max_digits=10, decimal_places=2)
     cupom = models.ForeignKey(
         'PedidoDesconto', on_delete=models.SET_NULL, null=True, blank=True)
     itens = models.ManyToManyField('PedidoItem')
 
-    dono = models.ForeignKey('Usuario', on_delete=models.CASCADE)
-
     status = models.CharField(max_length=1, choices=[
         ('P', 'Pendente'), ('C', 'Cancelado'), ('S', 'Estornado'), ('E', 'Entregue')
-    ])
+    ], default='P')
 
     def __str__(self):
         return f'#{self.numero}'
 
     @property
     def numero(self):
-        return f'{self.id:06d}'
+        return f'{self.pk:06d}'
 
     def valor_total(self):
-        if self.desconto:
-            return self.valor - self.desconto.calcular(self.valor)
+        if self.cupom:
+            return self.valor - self.cupom.calcular(self.valor)
         else:
             return self.valor
+
+    # Calcula todos os itens do pedido, e retorna o valor total
+    def total(self):
+        total, bruto, cupom, desconto = 0, 0, 0
+        for item in self.itens.all():
+            total += item.valor_total()
+            bruto += item.produto.preco * item.quantidade
+            desconto += item.produto.preco_liquido() * item.quantidade
+            if item.cupom:
+                cupom += item.cupom.calcular(item.produto.preco)
 
 
 class PedidoItem(models.Model):
     produto = models.ForeignKey('Produto', on_delete=models.RESTRICT)
     quantidade = models.IntegerField(validators=[MinValueValidator(1)])
     desconto = models.ForeignKey(
-        'PedidoDescontoProduto', null=True, blank=True, on_delete=models.RESTRICT)
+        'PedidoDesconto', related_name='pedidos_descontos', null=True, blank=True, on_delete=models.RESTRICT)
+    cupom = models.ForeignKey(
+        'PedidoDesconto', related_name='pedidos_cupons', null=True, blank=True, on_delete=models.RESTRICT)
     valor = models.DecimalField(max_digits=10, decimal_places=2)
 
     def valor_total(self):
-        return self.valor * self.quantidade
+        valor = self.produto.preco_liquido(self.desconto)
+        if self.cupom:
+            valor -= self.cupom.calcular(valor)
+        return valor * self.quantidade
 
     def __str__(self):
-        return f'{self.produto} - x{self.quantidade} - R$ {intcomma(self.valor_total())}'
+        return f'{self.produto} - x{self.quantidade} - R$ {intcomma(self.valor_total(self.desconto))}'
 
 
 class PedidoDesconto(models.Model):
@@ -165,13 +161,14 @@ class PedidoDesconto(models.Model):
     fim = models.DateTimeField(blank=True, null=True, db_index=True)
     desconto = models.DecimalField(max_digits=10, decimal_places=2)
 
-    produtos = models.ManyToManyField(
-        'Produto', through='PedidoDescontoProduto')
-    categorias = models.ManyToManyField(
-        'Categoria', through='PedidoDescontoCategoria')
-    tags = models.ManyToManyField('Tag', through='PedidoDescontoTag')
+    produtos = models.ManyToManyField('Produto', blank=True)
+    categorias = models.ManyToManyField('Categoria', blank=True)
+    tags = models.ManyToManyField('Tag', blank=True)
 
     objects = PedidoDescontoManager()
+
+    def calcular_preco(self, preco):
+        return preco - self.calcular(preco)
 
     def calcular(self, valor):
         if self.tipo == 'P':
@@ -179,11 +176,18 @@ class PedidoDesconto(models.Model):
         else:
             return self.desconto
 
-    def procentagem(self, valor):
+    def porcentagem(self, valor):
         if self.tipo == 'V':
             return self.desconto / valor * 100
         else:
             return self.desconto
+
+    def aplicavel(self, produto):
+        return (
+            self.produtos.filter(id=produto.id).exists() or
+            self.categorias.filter(id=produto.categoria.id).exists() or
+            self.tags.filter(id__in=produto.tags.all()).exists()
+        )
 
     # Ao salvar como Cupom e o codigo estiver em branco ele irá um código aleatório com hexadecimais
     def save(self, *args, **kwargs):
@@ -191,20 +195,31 @@ class PedidoDesconto(models.Model):
             self.codigo = secrets.token_hex(3).upper()
         super().save(*args, **kwargs)
 
-
-class PedidoDescontoTag(models.Model):
-    pedidodesconto = models.ForeignKey(
-        'PedidoDesconto', on_delete=models.CASCADE)
-    tag = models.ForeignKey('Tag', on_delete=models.CASCADE)
+    def __str__(self):
+        return self.nome
 
 
-class PedidoDescontoCategoria(models.Model):
-    pedidodesconto = models.ForeignKey(
-        'PedidoDesconto', on_delete=models.CASCADE)
-    categoria = models.ForeignKey('Categoria', on_delete=models.CASCADE)
-
-
-class PedidoDescontoProduto(models.Model):
-    pedidodesconto = models.ForeignKey(
-        'PedidoDesconto', on_delete=models.CASCADE)
+class CarrinhoItem (models.Model):
+    user = models.ForeignKey('Usuario', on_delete=models.CASCADE)
     produto = models.ForeignKey('Produto', on_delete=models.CASCADE)
+    quantidade = models.IntegerField(validators=[MinValueValidator(1)])
+
+    def __str__(self):
+        return f'{self.produto} - x{self.quantidade}'
+
+    @property
+    def preco_bruto(self):
+        return self.produto.preco * self.quantidade
+
+    @property
+    def preco_desconto(self):
+        return self.produto.desconto().calcular(self.produto.preco) * self.quantidade if self.produto.desconto() else 0
+
+    @property
+    def total(self):
+        return self.produto.preco_liquido() * self.quantidade
+
+    class Meta:
+        index_together = [
+            ("user", "produto"),
+        ]

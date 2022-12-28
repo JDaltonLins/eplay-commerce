@@ -1,5 +1,6 @@
+from django.conf import settings
 from django.views.decorators.http import require_http_methods
-from django.shortcuts import render
+from django.shortcuts import redirect, render
 from django.urls import path
 from manager.models.usuario import UsuarioConfirmacao
 from manager.utils import required_login
@@ -19,24 +20,26 @@ def login(req):
                 username=form.cleaned_data['username'],
                 password=form.cleaned_data['password']
             )
-            if user is None:
+            if user is None or user.is_anonymous:
                 form.add_error('username', 'Usuário ou senha inválidos')
                 form.add_error('password', 'Usuário ou senha inválidos')
-            login_django(req, user)
-            if not user.is_active or not user.email_verified:
-                return redirect_to(req, 'auth/info')
             else:
-                url_next = req.GET.get('next', None)
-                if url_next is not None:
-                    parsed = urlsplit(url_next)
-                    if parsed and parsed.netloc == req.get_host():
-                        return redirect_to(req, url_next)
-                    else:
-                        return redirect_to(req, url_next)
-                elif user.is_staff:
-                    return redirect_to(req, 'painel/home')
+                login_django(req, user)
+
+                if not user.is_active or not user.email_verified:
+                    return redirect_to(req, 'auth/info')
                 else:
-                    return redirect_to(req, 'home')
+                    url_next = req.GET.get('next', None)
+                    if url_next is not None:
+                        parsed = urlsplit(url_next)
+                        if parsed and (parsed.netloc == req.get_host() or parsed.netloc == ''):
+                            return redirect(url_next)
+                        else:
+                            return redirect_to(req, 'home')
+                    elif user.is_staff:
+                        return redirect_to(req, 'painel/home')
+                    else:
+                        return redirect_to(req, 'home')
     else:
         form = LoginForm()
 
@@ -51,6 +54,7 @@ def registrar(req):
             # Irá tentar registrar o usuário
             user = form.save(commit=False)
             user.set_password(form.cleaned_data['password'])
+            user.email_verified = not settings.EMAIL_USE
             user.save()
             return redirect_to(req, 'auth/login')
     else:
@@ -61,7 +65,6 @@ def registrar(req):
 
 @require_http_methods(['GET'])
 def info(req):
-    print(req.user, req.user.id)
     if req.user is None or req.user.is_anonymous:
         return redirect_to(req, 'auth/login')
     elif not req.user.is_active:

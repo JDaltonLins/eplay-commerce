@@ -1,0 +1,97 @@
+{% extends "layout/index.html" %}
+{% load static %}
+{% load humanize %}
+{% block head %}
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.8/dist/sweetalert2.min.css"
+          integrity="sha256-sWZjHQiY9fvheUAOoxrszw9Wphl3zqfVaz1kZKEvot8="
+          crossorigin="anonymus"/>
+    <script id="produto-data" type="application/ld+json">{% autoescape off %}{{ produto_meta }}{% endautoescape %}</script>
+    <link rel="stylesheet" href="{% static 'css/produto.css' %}"/>
+{% endblock head %}
+{% block content %}
+    <!--- Vai montar uma tela de pedido, onde cada pedido terá sua informação e um dropbox/accordon -->
+    <!---
+    | - Pedido X - Informações (Total, Data, Status, etc) - \/ (Expandir)
+    ---------------------------------------------------------------------
+    | - Item 1 - Informações (Nome, Quantidade, Valor, etc) 
+    | - Item 2 - Informações (Nome, Quantidade, Valor, etc)
+    | - Item 3 - Informações (Nome, Quantidade, Valor, etc)
+    ---------------------------------------------------------------------
+
+    | - Pedido Y - Informações (Total, Data, Status, etc) - \/ (Expandir)
+    ---------------------------------------------------------------------
+    | - Item 1 - Informações (Nome, Quantidade, Valor, etc)
+    | - Item 2 - Informações (Nome, Quantidade, Valor, etc)
+    | - Item 3 - Informações (Nome, Quantidade, Valor, etc)
+
+    -->
+    <!--- O pedido X e Y são os pedidos, cada pedido terá seus itens, e cada item terá suas informações -->
+    <div class="accordion" id="pedidos">
+        {% for pedido in pedidos %}
+            {% with aberto = request.GET['pedido'] == pedido.numero %}
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingOne">
+                        <button class="accordion-button"
+                                type="button"
+                                data-bs-toggle="collapse"
+                                data-bs-target="#collapseOne"
+                                aria-expanded="true"
+                                aria-controls="collapseOne">
+                            Pedido {{ pedido.numero }} - {{ pedido.data|date:"d/m/Y" }} - {{ pedido.total|floatformat:2 }} - {{ pedido.status }}
+                        </button>
+                    </h2>
+                    <div id="collapseOne"
+                         class="accordion-collapse collapse show"
+                         aria-labelledby="headingOne"
+                         data-bs-parent="#accordionExample">
+                        <div class="accordion-body">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Produto</th>
+                                        <th>Quantidade</th>
+                                        <th>Preço</th>
+                                        <th>Desconto</th>
+                                        <th>Total</th>
+                                        <th>Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for item in pedido.items.all %}
+                                        <tr>
+                                            <td>
+                                                <a href="{% url 'produto' produto_id=item.produto.id %}">{{ item.produto.nome }}</a>
+                                            </td>
+                                            <td>{{ item.quantidade }}</td>
+                                            <td>R$ {{ item.preco_bruto|floatformat:2|intcomma }}</td>
+                                            <td>R$ {{ item.preco_desconto|floatformat:2|intcomma }}</td>
+                                            <td>R$ {{ item.total|floatformat:2|intcomma }}</td>
+                                            <td>
+                                                <button class="btn btn-danger btn-sm remover-produto"
+                                                        data-id="{{ item.id }}" data-redirect="true">
+                                                    Remover
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                                <tfoot>
+                                    <tr>
+                                        <td colspan="2" class="text-right">Total</td>
+                                        <td>R$ {{ pedido.total.bruto|floatformat:2|intcomma }}</td>
+                                        <td>R$ {{ pedido.total.desconto|floatformat:2|intcomma }}</td>
+                                        <td>R$ {{ pedido.total.liquido|floatformat:2|intcomma }}</td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            {% endwith %}
+        {% endfor %}
+    </div>
+    <form id="csfr">
+        {% csrf_token %}
+    </form>
+{% endblock content %}

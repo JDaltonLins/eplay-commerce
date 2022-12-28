@@ -11,6 +11,4 @@ from website.views.user import urlpatterns as user_patterns
 from website.views import render_index
 urlpatterns = [
     path('', render_index, name='home'),
-    path('promocoes/', render,
-         {'template_name': 'promocoes.html'}, name='promocoes'),
 ] + auth_patterns + produtos_patterns + carrinho_patterns + user_patterns

@@ -16,6 +16,7 @@ class Usuario (AbstractUser, PermissionsMixin):
     cargo = models.ForeignKey(
         'Cargo', on_delete=models.CASCADE, null=True, blank=True)
     email_verified = models.BooleanField(default=settings.EMAIL_USE)
+    cpf = models.CharField(max_length=14, blank=True, null=True)
 
     objects = UsuarioManager()
 

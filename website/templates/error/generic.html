@@ -1,0 +1,23 @@
+{% extends "./../layout/index.html" %}
+{% load static %}
+{% block head %}
+    <style>
+    body {
+        height: 100vh;
+    }
+    </style>
+    <link rel="stylesheet" href="{% static 'css/auth.css' %}" />
+{% endblock head %}
+{% block bodyTags %}
+    page="info"{% endblock bodyTags %}
+    {% block mainTags %}
+        class="d-flex flex-column justify-center align-center"
+    {% endblock mainTags %}
+    {% block content %}
+        <div class="info-content m-auto bg-dark p-3 rounded">
+            <span class="neonText">{{ error }}</span>
+            <span class="neonText">{{ message }}</span>
+        </div>
+    {% endblock content %}
+    {% block scripts %}
+    {% endblock scripts %}

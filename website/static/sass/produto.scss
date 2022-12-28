@@ -10,18 +10,22 @@
     display: flex;
     flex-direction: column;
   }
+
   .nome {
     font-size: 1.5rem;
     font-weight: 600;
     margin: 0.5rem 0;
   }
+
   .slogan {
     margin-top: 0.5rem;
     color: $gray-300;
   }
+
   .categoria {
     margin-top: -0.5rem;
   }
+
   .categoria,
   .tags {
     font-size: small;
@@ -30,5 +34,33 @@
 
   a:not(.btn) {
     color: $gray-500;
+  }
+
+
+  .preco {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+
+    font-size: 1.1rem;
+    font-weight: 600;
+
+    >.preco-antigo {
+      color: $gray-600 !important;
+      text-decoration: line-through;
+      margin-right: 0.5rem;
+    }
+
+    >.preco-novo {}
+
+    >.desconto {
+      font-size: 0.9rem;
+      font-weight: 500;
+      letter-spacing: 1px;
+      background-color: $primary;
+      padding: 0.2rem 0.5rem;
+      border-radius: 0.5rem;
+      margin-right: 0.5rem;
+    }
   }
 }

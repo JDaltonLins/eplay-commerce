@@ -44,7 +44,7 @@ class FiltroProdutos (forms.Form):
                                        for t in Tag.objects.filter(ativo=True, produto__isnull=False).distinct().order_by(Length('nome'))]
         self.fields['q'].label = False
 
-        max = Produto.objects.all().aggregate(Max('preco'))['preco__max']
+        max = Produto.objects.all().aggregate(Max('preco'))['preco__max'] or 0
         max = (max // 10 + 1) * 10
 
         step_calced = max / 10
@@ -121,66 +121,6 @@ class FiltroProdutos (forms.Form):
         order_by = self.cleaned_data['order_by'] or 'nome'
         order_prefix = '-' if self.cleaned_data['order'] == 'desc' else ''
 
-        if order_by:
-            produtos = produtos.order_by(f'{order_prefix}{order_by}')
+        produtos = produtos.order_by(f'{order_prefix}{order_by}')
 
         return produtos.distinct()
-
-
-"""
-    Formato do Pedido que será entregue do cliente
-    
-    ```json
-    {
-        "cupom": "8D7E5S4F",
-        "itens": [
-            {
-                id: 1,
-                qtd: 2
-            },
-            {
-                id: 7,
-                qtd: 1
-            }
-        ]
-    }
-    ``
-"""
-
-
-class PedidoProdutoForm(forms.Form):
-    id = forms.IntegerField(min_value=1)
-    qtd = forms.IntegerField(min_value=1)
-
-    # Realiza a validação do produto ao receber,
-    def clean(self):
-        cleaned_data = super().clean()
-
-        try:
-            cleaned_data['produto'] = Produto.objects.get(
-                ativo=True, id=cleaned_data['id'])
-        except Produto.DoesNotExist:
-            raise forms.ValidationError('Produto não encontrado')
-
-        return cleaned_data
-
-
-PedidoProdutosForm = formset_factory(PedidoProdutoForm, extra=0, min_num=1)
-
-
-class PedidoForm(forms.Form):
-    cupom = forms.CharField(max_length=50, min_length=5, required=False)
-    pedidos = PedidoProdutosForm
-
-    def clean(self):
-        cleaned_data = super().clean()
-
-        cupom = cleaned_data.get('cupom')
-        if cupom:
-            try:
-                cleaned_data['cupom'] = PedidoDesconto.objects.procurar_cupom(
-                    cupom)
-            except PedidoDesconto.DoesNotExist:
-                raise forms.ValidationError('Cupom não encontrado')
-
-        return cleaned_data

@@ -21,11 +21,6 @@
   position: relative;
 }
 
-#shower > div:nth-child(2) {
-  overflow-x: scroll;
-  overflow-y: hidden;
-}
-
 #shower [data-title] > div {
   display: none !important;
 }
@@ -37,16 +32,16 @@
 }
 
 /* Mantem o padrão dark-slim junto ao scroll */
-#shower > div:nth-child(2)::-webkit-scrollbar {
+*::-webkit-scrollbar {
   width: 0.5em;
 }
 
-#shower > div:nth-child(2)::-webkit-scrollbar-track {
+*::-webkit-scrollbar-track {
   background-color: #1e1e1e;
   border-radius: 0.75rem;
 }
 
-#shower > div:nth-child(2)::-webkit-scrollbar-thumb {
+*::-webkit-scrollbar-thumb {
   background-color: #2e2e2e;
   border-radius: 0.75rem;
 }
