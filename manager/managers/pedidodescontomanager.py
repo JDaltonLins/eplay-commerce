@@ -4,6 +4,7 @@ from django.db import models
 from django.utils import timezone
 from django.db.models import Q
 
+from django.core import serializers
 
 class PedidoDescontoManager (models.Manager):
 

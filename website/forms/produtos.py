@@ -1,9 +1,11 @@
 from django import forms
 from django.forms import HiddenInput, formset_factory
-from django.db.models import Max
+from django.db.models import Max, Q
 from django.db.models.functions import Length
 
 from manager.models.produtos import Categoria, PedidoDesconto, Produto, Tag
+from django.db import models
+from django.utils import timezone
 
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Fieldset, Submit, Div, HTML
@@ -73,11 +75,6 @@ class FiltroProdutos (forms.Form):
             Submit('submit', 'Pesquisar'),
         )
 
-    # Atualiza uns campos ao carregar os dados
-    def load(self, data):
-
-        return self.cleaned_data
-
     def clean(self):
         cleaned_data = super().clean()
         preco_min = cleaned_data.get('preco_min')
@@ -121,6 +118,40 @@ class FiltroProdutos (forms.Form):
         order_by = self.cleaned_data['order_by'] or 'nome'
         order_prefix = '-' if self.cleaned_data['order'] == 'desc' else ''
 
-        produtos = produtos.order_by(f'{order_prefix}{order_by}')
+        # # Vai pegar o desconto aplicado, proximo aos produtos, tags e categorias
+
+        # produtos = produtos.annotate(
+        #     desconto=PedidoDesconto.objects.filter(
+        #         retorno='P',
+        #         ativo=True
+        #     ).filter(
+        #         Q(inicio__lte=timezone.now()) | Q(inicio__isnull=True),
+        #         Q(fim__gte=timezone.now()) | Q(fim__isnull=True)
+        #     ).filter(
+        #         Q(categorias__in=models.OuterRef('categorias')) |
+        #         Q(tags__in=models.OuterRef('tags')) |
+        #         Q(produtos__in=models.OuterRef('pk'))
+        #     ).annotate(
+        #         calculado=models.Case(
+        #             models.When(tipo='P', then=models.F(
+        #                 'desconto') * models.OuterRef('preco') / 100),
+        #             models.When(tipo='V', then=models.F('desconto')),
+        #             default=0,
+        #             output_field=models.DecimalField()
+        #         )
+        #     ).order_by('-calculado').values('calculado')[:1]
+        # ).annotate(preco_liquido2=models.F('preco') - models.F('desconto'))
+
+        # # Se for ordenar por preço, ordena pelo desconto
+
+        # if order_by == 'preco':
+        #     order_by = 'preco_liquido2'
+
+        # import json
+
+        # produtos = produtos.order_by(f'{order_prefix}{order_by}')
+        # print(json.dumps([(item.nome, float(item.desconto or 0), float(item.preco))
+        #       for item in produtos.distinct()]))
+        # print(produtos.query)
 
         return produtos.distinct()

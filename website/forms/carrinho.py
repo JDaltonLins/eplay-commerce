@@ -29,7 +29,6 @@ class CarrinhoAction(forms.Form):
         try:
             CarrinhoItem.objects.get(
                 user=user, produto=self.cleaned_data['produto']).delete()
-            print('deletado')
             return {'status': 'success'}
         except Exception as e:
             return {

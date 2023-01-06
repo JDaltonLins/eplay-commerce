@@ -1,0 +1,58 @@
+{% extends "layout/index.html" %} {% load static %} {% block head %}
+<link rel="stylesheet" href="{% static 'css/sobre-nos.css' %}" />
+{% endblock %} {% block content %}
+<div class="container p-2 gap-4 d-flex flex-column">
+  <div class="row bg-dark border border-little p-3 rounded d-flex flex-column gap-3">
+    <div>
+      <h1>Sobre o site</h1>
+      <p>O site foi criado baseado nos e-commerce de jogos, com intuito de facilitar a venda de jogos e derivados do mundo virtual dos games.</p>
+    </div>
+    <div class="col border border-little p-3 bg-deepdark rounded">
+      <h2>Como funciona?</h2>
+      <p>O intuito de tudo é facilitar a venda para os Gamers centralizando tudo do mundo dos games para um e-commerce de jogos.</p>
+      <p>Você pode realizar se registrasse e efetuar login para poder comprar os produtos que desejar.</p>
+      <p>Você pode realizar a busca de produtos pela categoria, sub-categoria ou tags envolvidas no site.</p>
+      <p>Você pode ter uma visualização e agendamentos de produtos que serão lançados no site.</p>
+    </div>
+  </div>
+  <div class="row bg-dark border border-little p-3 rounded d-flex flex-column gap-3">
+    <h1>Sobre os criadores</h1>
+    <div class="row mx-4">
+      <div class="col-md-2">
+        <img src="{% static 'img/daltinho.jpg' %}" class="img-fluid rounded-circle" alt="profile" />
+      </div>
+      <div class="col-md-10">
+        <p class="nome py-2 px-3 rounded position-relative left">
+          <span class="text-dark position-absolute top-0 start-0 translate-middle badge rounded-pill" style="background-color: #fff; "> Desenvolvedor </span>
+          Dalton Lins
+        </p>
+        <div class="info border border-little bg-deepdark rounded p-4 pb-1">
+          <p>
+            Atualmente no 4° ano, cursando Técnico Integrado em Informática, pelo IFRN (Campus Pau dos Ferros).<br />
+            Sou apaixonado por programação desde os 10 anos, primeira vez com Java no Minecraft.<br />
+            Sempre estou busca de novas aventuras para aprender novos conhecimentos e tentar de modos diferentes para expandir minhas fronteiras.
+          </p>
+        </div>
+      </div>
+    </div>
+    <div class="row mx-4">
+      <div class="col-md-10">
+        <p class="nome py-2 px-3 rounded position-relative">
+          Jussara Kelly
+          <span class="text-dark position-absolute top-0 start-100 translate-middle badge rounded-pill" style="background-color: #fff; "> Designer </span>
+        </p>
+        <div class="info border border-little bg-deepdark rounded p-4 pb-1">
+          <p>
+            Atualmente no 4° ano, cursando Técnico Integrado em Informática, pelo IFRN (Campus Pau dos Ferros).<br />
+            Eu sempre joguei vários jogos e ficava me perguntando como eles eram feitos, acabando por chegar nesse curso.<br />
+            Sou apaixonada por LoL e vários outros jogos, talvez não siga na informática mas posso dizer que ela foi essencial na minha vida.
+          </p>
+        </div>
+      </div>
+      <div class="col-md-2">
+        <img src="{% static 'img/jussara.jpg' %}" class="img-fluid rounded-circle" alt="profile" />
+      </div>
+    </div>
+  </div>
+  {% endblock %}
+</div>

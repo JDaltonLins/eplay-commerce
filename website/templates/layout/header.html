@@ -21,6 +21,9 @@
         <li class="nav-item">
           <a class="nav-link" href="{% url 'carrinho' %}">Carrinho</a>
         </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'sobre-nos' %}">Sobre nós</a>
+        </li>
         <li class="nav-item d-flex justify-content-center align-items-center">
           {% if request.user.is_authenticated %}
             <div class="flex-shrink-0 dropdown dropdown-center">
